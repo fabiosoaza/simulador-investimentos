@@ -1,0 +1,3 @@
+enum TipoOperacao{
+  COMPRA, VENDA
+}
