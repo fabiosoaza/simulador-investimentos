@@ -61,19 +61,25 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   }
 
   void salvar() {
-    setState(() {
+    setState(() async {
       var quantidade = FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
       var ativoCarteira = AtivoCarteira.novo(_ativo, ValorMonetario.brl(_precoAtivo.text), quantidade);
       if(_tipoOperacao == TipoOperacao.COMPRA) {
         _applicationContext.ativoCarteiraService.adicionarAtivoCarteira(
-            ativoCarteira);
+            ativoCarteira)
+        .then((value) {
+          _applicationContext.cotacaoService.carregarCotacoes();
+        })
+        ;
       }
       else{
         _applicationContext.ativoCarteiraService.removerAtivoCarteira(
-            ativoCarteira);
+            ativoCarteira).then((value)  {
+          _applicationContext.cotacaoService.carregarCotacoes();
+            })
+        ;
       }
       //recarrega cache de cotações
-      _applicationContext.cotacaoService.carregarCotacoes();
       NavigationUtils.replaceWithMercado(context).then((value) {
         NavigationUtils.showToast(context, "Operação efetuada com sucesso.");
       });

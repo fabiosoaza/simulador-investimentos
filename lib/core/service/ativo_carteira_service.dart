@@ -16,9 +16,9 @@ class AtivoCarteiraService {
     var ativoCarteiraBase = await _ativoCarteiraDao.carregarAtivoCarteiraPorCodigo(ativoCarteira.ativo.ticker);
     if (ativoCarteiraBase != null) {
       AtivoCarteira ativoCarteiraAtualizar = somarValores(ativoCarteira, ativoCarteiraBase);
-      await _ativoCarteiraDao.atualizar(ativoCarteiraAtualizar);
+      return await _ativoCarteiraDao.atualizar(ativoCarteiraAtualizar);
     } else {
-      await _ativoCarteiraDao.inserir(ativoCarteira);
+      return await _ativoCarteiraDao.inserir(ativoCarteira);
     }
   }
 
@@ -26,11 +26,11 @@ class AtivoCarteiraService {
     var ativoCarteiraBase = await _ativoCarteiraDao.carregarAtivoCarteiraPorCodigo(ativoCarteira.ativo.ticker);
     if (ativoCarteiraBase != null) {
       if((ativoCarteiraBase.quantidade - ativoCarteira.quantidade) == 0){
-        await _ativoCarteiraDao.excluir(ativoCarteiraBase);
+        return await _ativoCarteiraDao.excluir(ativoCarteiraBase);
       }
       else{
         AtivoCarteira ativoCarteiraAtualizar = subtrairValores(ativoCarteira, ativoCarteiraBase);
-        await _ativoCarteiraDao.atualizar(ativoCarteiraAtualizar);
+        return await _ativoCarteiraDao.atualizar(ativoCarteiraAtualizar);
       }
 
     }
