@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/ativo.dart';
-import 'package:simulador_investimentos/core/model/tipo_operacao.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
 
@@ -39,7 +39,7 @@ class _CardAtivosState extends State<CardAtivos> {
 
   Future<void> reload() async {
     final ativos =
-        await _applicationContext.ativoService.listarPorTipo(_tipoAtivo);
+        await _applicationContext.ativoRepository.listarPorTipo(_tipoAtivo);
     var updateView = () {
       this._ativos = ativos;
     };

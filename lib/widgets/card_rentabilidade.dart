@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/carteira.dart';
-import 'package:simulador_investimentos/core/model/valor_monetario.dart';
+import 'package:simulador_investimentos/core/model/domain/carteira.dart';
+import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
@@ -30,7 +30,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
 
   Future<void> reload() async {
     atualizarDadosView();
-    _carteira = await _applicationContext.ativoCotacaoService.listarAtivosCarteira();
+    _carteira = await _applicationContext.ativoCotacaoRepository.carregar();
     var updateView = () {
       atualizarDadosView();
     };

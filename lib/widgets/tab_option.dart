@@ -31,40 +31,34 @@ class _TabOptionState extends State<TabOption> {
   }
 
   Widget menuRentabilidade() {
-    return
-      InkWell(
-        onTap: (){
-          NavigationUtils.replaceWithHome(context);
-        },
-        child:
-      Container(
-                  height: 100,
-                  width: 100,
-                  color: Color.fromRGBO(255, 255, 255, .2),
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    //vertical
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Icon(Icons.show_chart, color: Colors.white, size: 30),
-                      Spacer(),
-                      Text('Patrimônio',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white))
-                    ],
-                  ),
-                ));
+    return menu('Patrimônio', Icons.show_chart, () {
+      NavigationUtils.replaceWithHome(context);
+    });
   }
 
   Widget menuCarteira() {
+    return menu('Carteira', Icons.account_balance_wallet, () {
+      NavigationUtils.replaceWithAtivosCarteira(context);
+    });
+  }
+
+  Widget menuMercado() {
+    return menu('Mercado', Icons.assessment, () {
+      NavigationUtils.replaceWithMercado(context);
+    });
+  }
+
+  Widget menu(String title,  IconData icon, Function() onTapAction) {
+    var onTap2 = (){
+            NavigationUtils.replaceWithHome(context);
+          };
+    var icon = Icons.show_chart;
+    var title = 'Patrimônio';
     return
       InkWell(
-          onTap: (){
-            NavigationUtils.replaceWithAtivosCarteira(context);
-          },
-          child: Container(
+          onTap: onTap2,
+          child:
+          Container(
             height: 100,
             width: 100,
             color: Color.fromRGBO(255, 255, 255, .2),
@@ -73,47 +67,23 @@ class _TabOptionState extends State<TabOption> {
               //vertical
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Icon(Icons.account_balance_wallet, color: Colors.white, size: 30),
+                Icon(icon, color: Colors.white, size: 30),
                 Spacer(),
-                Text('Carteira',
+                Text(title,
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white))
               ],
             ),
-          )
-      );
+          ));
   }
 
 
-  Widget menuMercado() {
-    return
-      InkWell(
-          onTap: (){
-            NavigationUtils.replaceWithMercado(context);
-          },
-      child: Container(
-      height: 100,
-      width: 100,
-      color: Color.fromRGBO(255, 255, 255, .2),
-      padding: EdgeInsets.all(10),
-      child: Column(
-        //vertical
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(Icons.assessment, color: Colors.white, size: 30),
-          Spacer(),
-          Text('Mercado',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white))
-        ],
-      ),
-    )
-      );
-  }
+
+
+
+
 
 
 

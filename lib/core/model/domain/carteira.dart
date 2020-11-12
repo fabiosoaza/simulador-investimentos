@@ -1,6 +1,6 @@
-import 'package:simulador_investimentos/core/model/ativo_carteira.dart';
-import 'package:simulador_investimentos/core/model/ativo_carteira_cotacao.dart';
-import 'package:simulador_investimentos/core/model/valor_monetario.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao.dart';
+import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 
 class Carteira {
   List<AtivoCarteiraCotacao> _ativosCarteiraCotacao;

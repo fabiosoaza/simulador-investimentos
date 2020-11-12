@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/ativo.dart';
-import 'package:simulador_investimentos/core/model/tipo_operacao.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/form_operacao_ativo.dart';
 

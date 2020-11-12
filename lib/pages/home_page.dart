@@ -1,46 +1,33 @@
 import "package:flutter/material.dart";
-import 'package:simulador_investimentos/themes/colors.dart';
-import 'package:simulador_investimentos/widgets/card_ativos_carteira.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page_state.dart';
 import 'package:simulador_investimentos/widgets/card_rentabilidade.dart';
-import 'package:simulador_investimentos/widgets/person_identification.dart';
-import 'package:simulador_investimentos/widgets/tab_option.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends DefaultStatefullPage {
 
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(true);
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends DefaultStatefullPageState {
 
-  bool _isExpanded = false;
+  _HomePageState(bool showBottomMenu) : super(showBottomMenu);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      appBar: AppBar(
-        title: PersonIdentification(),
-         elevation: 0,
+  List<Widget> buildWidgets() {
+    var widgets = <Widget>[
+      Expanded(
+          child: ListView(
+            children: [
+              CardRentabilidade(),
+            ],
+          )
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20, bottom: 20, top: 20),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-                child: ListView(
-                  children: [
-                    CardRentabilidade(),
-                  ],
-                )
-            ),
-            SizedBox(height: 20,)
-            ,
-            TabOption()
-          ],
-        ),
-      ),
-    );
+      SizedBox(height: 20,)
+    ];
+    return widgets;
   }
+
+
 }

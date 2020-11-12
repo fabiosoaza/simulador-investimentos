@@ -1,4 +1,4 @@
-import 'package:simulador_investimentos/core/model/tipo_ativo.dart';
+
 
 class Ativo{
 

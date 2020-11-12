@@ -1,4 +1,4 @@
-import 'package:simulador_investimentos/core/model/valor_monetario.dart';
+import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 
 import 'ativo.dart';
 

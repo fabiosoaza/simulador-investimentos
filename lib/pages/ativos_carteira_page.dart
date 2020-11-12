@@ -1,44 +1,29 @@
 import "package:flutter/material.dart";
-import 'package:simulador_investimentos/themes/colors.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page_state.dart';
 import 'package:simulador_investimentos/widgets/card_ativos_carteira.dart';
-import 'package:simulador_investimentos/widgets/person_identification.dart';
-import 'package:simulador_investimentos/widgets/tab_option.dart';
 
-class AtivosCarteiraPage extends StatefulWidget {
-
-
+class AtivosCarteiraPage extends DefaultStatefullPage {
   @override
-  _AtivosCarteiraPageState createState() => _AtivosCarteiraPageState();
+  _AtivosCarteiraPageState createState() => _AtivosCarteiraPageState(true);
 }
 
-class _AtivosCarteiraPageState extends State<AtivosCarteiraPage> {
-
+class _AtivosCarteiraPageState extends DefaultStatefullPageState {
+  _AtivosCarteiraPageState(bool showBottomMenu) : super(showBottomMenu);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      appBar: AppBar(
-        title: PersonIdentification(),
-         elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20, bottom: 20, top: 20),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-                child: ListView(
-                  children: [
-                    CardAtivosCarteira(),
-                  ],
-                )
-            ),
-            SizedBox(height: 20,)
-            ,
-            TabOption()
-          ],
-        ),
-      ),
-    );
+  List<Widget> buildWidgets() {
+    var widgets = <Widget>[
+      Expanded(
+          child: ListView(
+        children: [
+          CardAtivosCarteira(),
+        ],
+      )),
+      SizedBox(
+        height: 20,
+      )
+    ];
+    return widgets;
   }
 }

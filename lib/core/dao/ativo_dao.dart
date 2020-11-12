@@ -1,4 +1,4 @@
-import 'package:simulador_investimentos/core/model/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 
 import 'database_helper.dart';
 
@@ -9,6 +9,8 @@ class AtivoDao {
   static const COLUNA_TICKER = "ticker";
   static const COLUNA_TIPO = "tipo";
   static const COLUNA_NOME = "nome";
+  static const COLUNA_MERCADO = "mercado";
+
 
   DatabaseHelper _databaseHelper;
 

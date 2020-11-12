@@ -1,51 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:simulador_investimentos/core/model/ativo.dart';
-import 'package:simulador_investimentos/core/model/tipo_operacao.dart';
-import 'package:simulador_investimentos/themes/colors.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page.dart';
+import 'package:simulador_investimentos/pages/template/default_statefull_page_state.dart';
 import 'package:simulador_investimentos/widgets/card_operacao.dart';
-import 'package:simulador_investimentos/widgets/person_identification.dart';
 
-class OperacaoPage extends StatefulWidget {
-
+class OperacaoPage extends DefaultStatefullPage {
   TipoOperacao _tipoOperacao;
   Ativo _ativo;
 
   OperacaoPage(TipoOperacao tipoOperacao, Ativo ativo) {
-  this._tipoOperacao = tipoOperacao;
-  this._ativo = ativo;
+    this._tipoOperacao = tipoOperacao;
+    this._ativo = ativo;
   }
 
-
   @override
-  _OperacaoPageState createState() => _OperacaoPageState(_tipoOperacao, _ativo);
+  _OperacaoPageState createState() =>
+      _OperacaoPageState(false, _tipoOperacao, _ativo);
 }
 
-class _OperacaoPageState extends State<OperacaoPage> {
-
+class _OperacaoPageState extends DefaultStatefullPageState {
   TipoOperacao _tipoOperacao;
   Ativo _ativo;
 
-  _OperacaoPageState(TipoOperacao tipoOperacao, Ativo ativo) {
-  this._tipoOperacao = tipoOperacao;
-  this._ativo = ativo;
+  _OperacaoPageState(
+      bool showBottonMenu, TipoOperacao tipoOperacao, Ativo ativo)
+      : super(showBottonMenu) {
+    this._tipoOperacao = tipoOperacao;
+    this._ativo = ativo;
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      appBar: AppBar(
-        title: PersonIdentification(),
-        elevation: 0,
-      ),
-       body: Padding(
-        padding: const EdgeInsets.only(left: 20, bottom: 20, top: 20),
-        child: Column(
-          children: <Widget>[
-            CardOperacao(_tipoOperacao, _ativo)
-          ],
-        ),
-      ),
-    );
+  List<Widget> buildWidgets() {
+    var widgets = <Widget>[CardOperacao(_tipoOperacao, _ativo)];
+    return widgets;
   }
 }

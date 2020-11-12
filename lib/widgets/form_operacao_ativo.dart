@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/ativo.dart';
-import 'package:simulador_investimentos/core/model/ativo_carteira.dart';
-import 'package:simulador_investimentos/core/model/tipo_operacao.dart';
-import 'package:simulador_investimentos/core/model/validador_valor.dart';
-import 'package:simulador_investimentos/core/model/valor_monetario.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
+import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
+import 'package:simulador_investimentos/core/model/domain/validador_valor.dart';
+import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
@@ -61,28 +61,27 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   }
 
   void salvar() {
-    setState(() async {
-      var quantidade = FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
-      var ativoCarteira = AtivoCarteira.novo(_ativo, ValorMonetario.brl(_precoAtivo.text), quantidade);
-      if(_tipoOperacao == TipoOperacao.COMPRA) {
-        _applicationContext.ativoCarteiraService.adicionarAtivoCarteira(
-            ativoCarteira)
-        .then((value) {
-          _applicationContext.cotacaoService.carregarCotacoes();
-        })
-        ;
-      }
-      else{
-        _applicationContext.ativoCarteiraService.removerAtivoCarteira(
-            ativoCarteira).then((value)  {
-          _applicationContext.cotacaoService.carregarCotacoes();
-            })
-        ;
-      }
+    var quantidade = extrairQuantidade();
+    var ativoCarteira = AtivoCarteira.novo(_ativo, extrairPrecoMedio(), quantidade);
+    executarOperacao(ativoCarteira);
+    setState(()  {
       //recarrega cache de cotações
       NavigationUtils.replaceWithMercado(context).then((value) {
         NavigationUtils.showToast(context, "Operação efetuada com sucesso.");
       });
+    });
+  }
+
+  ValorMonetario extrairPrecoMedio() => ValorMonetario.brl(_precoAtivo.text);
+
+  double extrairQuantidade() => FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
+
+  void executarOperacao(AtivoCarteira ativoCarteira) {
+    var result = _tipoOperacao == TipoOperacao.COMPRA ? _applicationContext.ativoCarteiraRepository.adicionar(
+        ativoCarteira) : _applicationContext.ativoCarteiraRepository.remover(
+        ativoCarteira);
+    result.then((value) {
+      _applicationContext.cotacaoRepository.carregarCotacoes();
     });
   }
 

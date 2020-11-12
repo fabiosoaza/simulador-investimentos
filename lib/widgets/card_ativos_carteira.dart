@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/ativo.dart';
-import 'package:simulador_investimentos/core/model/ativo_carteira_cotacao.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
+import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 
 class CardAtivosCarteira extends StatefulWidget {
@@ -11,6 +12,9 @@ class CardAtivosCarteira extends StatefulWidget {
 }
 
 class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
+
+  static final int CASAS_DECIMAIS = 2;
+
   ApplicationContext _applicationContext = ApplicationContext.instance();
   List<AtivoCarteiraCotacao> _ativoCarteiraCotacao =
       List<AtivoCarteiraCotacao>();
@@ -23,7 +27,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
   Future<void> reload() async {
     final carteira =
-        await _applicationContext.ativoCotacaoService.listarAtivosCarteira();
+        await _applicationContext.ativoCotacaoRepository.carregar();
     var updateView = () {
       this._ativoCarteiraCotacao = carteira.ativosCarteiraCotacao;
     };
@@ -125,21 +129,15 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
   Widget headerCodigoAtivo() {
-    var title1 = 'Código';
-    var title2 = 'Quantidade';
-    return columnHeader(title1, title2);
+    return columnHeader(['Código', 'Quantidade']);
   }
 
   Widget headerPrecoMedio() {
-    var title1 = 'Preço médio';
-    var title2 = 'Preço atual';
-    return columnHeader(title1, title2);
+    return columnHeader(['Preço médio', 'Preço atual', 'Variação(%)']);
   }
 
   Widget headerValorTotal() {
-    var title1 = 'Valor compra';
-    var title2 = 'Valor atual';
-    return columnHeader(title1, title2);
+    return columnHeader(['Valor compra', 'Valor atual']);
   }
 
   int getNumeroCasasDecimais(Ativo ativo ){
@@ -149,51 +147,53 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   Widget contentCodigoAtivo(AtivoCarteiraCotacao ativoCarteiraCotacao) {
     var title1 = ativoCarteiraCotacao.ativoCarteira.ativo.ticker;
     var title2 = ativoCarteiraCotacao.ativoCarteira.quantidade.toString();
-    return columnContent(title1, title2);
+    return columnContent([title1, title2]);
   }
 
   Widget contentPrecoMedio(AtivoCarteiraCotacao ativoCarteiraCotacao) {
     var numeroCasasDecimais = getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
     var title1 = ativoCarteiraCotacao.ativoCarteira.precoMedio.valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.cotacao.valor.valorFormatadoComCasasDecimais(numeroCasasDecimais);
-    return columnContent(title1, title2);
+    var title3 = FormatadorNumeros().formatarPorcentagem(ativoCarteiraCotacao.rentabilidadePercentual(), CASAS_DECIMAIS)+'%';
+    return columnContent([title1, title2, title3]);
   }
 
   Widget contentValorTotal(AtivoCarteiraCotacao ativoCarteiraCotacao) {
     var numeroCasasDecimais = getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
     var title1 = ativoCarteiraCotacao.ativoCarteira.calcularValorTotal().valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.calcularValorAtual().valorFormatadoComCasasDecimais(numeroCasasDecimais);
-    return columnContent(title1, title2);
+    return columnContent([title1, title2]);
   }
 
-  Expanded columnHeader(String title1, String title2) {
+  Expanded columnHeader(List<String> titles) {
+    var widgets = <Widget>[];
+
+    for (var i = 0; i < titles.length; i++) {
+      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16)) : Text(titles[i]);
+      widgets.add(widget);
+    }
     return Expanded(
       child: Column(
         // align the text to the left instead of centered
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 16),
-          ),
-          Text(title2),
-        ],
+        children: widgets,
       ),
     );
   }
 
-  Expanded columnContent(String title1, String title2) {
+  Expanded columnContent(List<String> titles) {
+    var widgets = <Widget>[];
+
+    for (var i = 0; i < titles.length; i++) {
+      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16)) : Text(titles[i]);
+      widgets.add(widget);
+    }
+
     return Expanded(
       child: Column(
         // align the text to the left instead of centered
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 16),
-          ),
-          Text(title2),
-        ],
+        children: widgets,
       ),
     );
   }
