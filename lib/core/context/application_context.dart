@@ -16,7 +16,7 @@ class ApplicationContext {
   AtivoCarteiraDao _ativoCarteiraDao;
   CotacaoRepository _cotacaoRepository;
   AtivoRepository _ativoRepository;
-  CarteiraRepository _ativoCotacaoRepository;
+  CarteiraRepository _carteiraRepository;
   AtivoCarteiraRepository _ativoCarteiraRepository;
 
   static ApplicationContext _instance =  ApplicationContext._privateConstructor();
@@ -26,13 +26,13 @@ class ApplicationContext {
     _ativoDao = AtivoDao(_databaseHelper);
     _ativoCarteiraDao = AtivoCarteiraDao(_databaseHelper);
     _cotacaoRepository = CotacaoWebService(_ativoCarteiraDao);
-    _ativoCotacaoRepository = CarteiraService(_ativoCarteiraDao, _cotacaoRepository);
+    _carteiraRepository = CarteiraService(_ativoCarteiraDao, _cotacaoRepository);
     _ativoRepository = AtivoService(_ativoDao);
     _ativoCarteiraRepository = AtivoCarteiraService(_ativoCarteiraDao);
   }
 
   DatabaseHelper get databaseHelper => _databaseHelper;
-  CarteiraRepository get ativoCotacaoRepository => _ativoCotacaoRepository;
+  CarteiraRepository get carteiraRepository => _carteiraRepository;
   CotacaoRepository get cotacaoRepository => _cotacaoRepository;
   AtivoRepository get ativoRepository => _ativoRepository;
   AtivoCarteiraRepository get ativoCarteiraRepository => _ativoCarteiraRepository;

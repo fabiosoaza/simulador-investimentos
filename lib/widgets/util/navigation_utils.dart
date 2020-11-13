@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
@@ -27,6 +30,14 @@ class NavigationUtils {
     }));
   }
 
+  static void goBack( BuildContext context){
+    return  Navigator.pop(context);
+  }
+
+  static void close( BuildContext context){
+    return  goBack(context);
+  }
+
   static  Future<dynamic>  replaceWithMercado(BuildContext context) async {
     return replacePageWith(context, MercadoPage());
   }
@@ -42,14 +53,19 @@ class NavigationUtils {
   static  Future<dynamic>  replaceWithOperacao( BuildContext context, TipoOperacao tipoOperacao, Ativo ativo) async {
     return replacePageWith(context, OperacaoPage(tipoOperacao, ativo));
   }
-  
-  
-  
-  static void showToast(BuildContext context, String text, {Function onVisible} ) {
+
+
+
+  static void showMessage(final BuildContext context, String text, {Function onVisible} ) {
+    FocusScope.of(context).unfocus();
+    showFlushbar(text, context);
+  }
+
+  static void showSnackBar(BuildContext context, Function onVisible, String text) {
     final scaffold = Scaffold.of(context);
     scaffold.showSnackBar(
       SnackBar(
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 2),
         onVisible: onVisible??(){},
         backgroundColor: kWhiteColor,
         content: Text(
@@ -58,10 +74,23 @@ class NavigationUtils {
               color: kPrimaryColor, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         action: SnackBarAction(
-
+    
             label: 'Fechar', onPressed: scaffold.hideCurrentSnackBar),
       ),
     );
+  }
+
+  static void showFlushbar(String text, BuildContext context) {
+    Flushbar(
+      backgroundColor: kWhiteColor,
+      isDismissible: true,
+      messageText: Text(
+        text,
+        style: TextStyle(
+            color: kPrimaryColor, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+      duration:  Duration(seconds: 3),
+    )..show(context);
   }
 
   static void closePage(BuildContext context) {

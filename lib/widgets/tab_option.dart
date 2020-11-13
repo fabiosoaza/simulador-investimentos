@@ -49,14 +49,9 @@ class _TabOptionState extends State<TabOption> {
   }
 
   Widget menu(String title,  IconData icon, Function() onTapAction) {
-    var onTap2 = (){
-            NavigationUtils.replaceWithHome(context);
-          };
-    var icon = Icons.show_chart;
-    var title = 'Patrimônio';
-    return
+      return
       InkWell(
-          onTap: onTap2,
+          onTap: onTapAction,
           child:
           Container(
             height: 100,
@@ -78,12 +73,6 @@ class _TabOptionState extends State<TabOption> {
             ),
           ));
   }
-
-
-
-
-
-
 
 
 

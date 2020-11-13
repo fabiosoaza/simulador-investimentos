@@ -27,7 +27,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
   Future<void> reload() async {
     final carteira =
-        await _applicationContext.ativoCotacaoRepository.carregar();
+        await _applicationContext.carteiraRepository.carregar();
     var updateView = () {
       this._ativoCarteiraCotacao = carteira.ativosCarteiraCotacao;
     };
@@ -169,7 +169,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
     var widgets = <Widget>[];
 
     for (var i = 0; i < titles.length; i++) {
-      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16)) : Text(titles[i]);
+      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)) : Text(titles[i], style: TextStyle(fontWeight: FontWeight.bold));
       widgets.add(widget);
     }
     return Expanded(

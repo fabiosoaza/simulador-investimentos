@@ -111,8 +111,8 @@ class _CardAtivosState extends State<CardAtivos> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            headerCodigoAtivo(),
-            headerNomeAtivo(),
+            _headerCodigoAtivo(),
+            _headerNomeAtivo(),
           ],
         ),
       ),
@@ -128,8 +128,8 @@ class _CardAtivosState extends State<CardAtivos> {
             builder: (BuildContext context) {
               return Container(
                   child: Wrap(children: <Widget>[
-                    menuComprarAtivo(ativo),
-                    menuVenderAtivo(ativo)
+                    _menuComprarAtivo(ativo),
+                    _menuVenderAtivo(ativo)
 
                       ]
                   )
@@ -140,61 +140,65 @@ class _CardAtivosState extends State<CardAtivos> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            contentCodigoAtivo(ativo),
-            contentNomeAtivo(ativo),
+            _contentCodigoAtivo(ativo),
+            _contentNomeAtivo(ativo),
           ],
         ),
       ),
     ));
   }
 
-  Widget menuComprarAtivo(Ativo ativo) {
+  Widget _menuComprarAtivo(Ativo ativo) {
+    var operacao = TipoOperacao.COMPRA;
+    var icon = Icons.add_shopping_cart;
+    var text = 'Comprar ${ativo.nome}';
+    return _menuItem(operacao, ativo, icon, text);
+  }
+
+  Widget _menuVenderAtivo(Ativo ativo) {
+    var operacao = TipoOperacao.VENDA;
+    var icon = Icons.remove_shopping_cart;
+    var text = 'Vender ${ativo.nome}';
+    return _menuItem(operacao, ativo, icon, text);
+  }
+
+
+  ListTile _menuItem(TipoOperacao operacao, Ativo ativo, IconData icon, String text) {
     return ListTile(
-        onTap: () {
-          NavigationUtils.navigateToOperacao(
-              context, TipoOperacao.COMPRA, ativo);
-        },
-        leading: Icon(
-          Icons.add_shopping_cart,
-          size: 30,
-        ),
-        title: Text('Comprar ${ativo.nome}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)));
+      onTap: () {
+        NavigationUtils.close(context);
+        NavigationUtils.navigateToOperacao(
+            context, operacao, ativo);
+      },
+      leading: Icon(
+        icon,
+        size: 30,
+      ),
+      title: Text(text,
+          textAlign: TextAlign.left,
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+  );
   }
 
-  Widget menuVenderAtivo(Ativo ativo) {
-    return ListTile(
-        onTap: () {
-          NavigationUtils.navigateToOperacao(
-              context, TipoOperacao.VENDA, ativo);
-        },
-        leading: Icon(
-          Icons.remove_shopping_cart,
-          size: 30,
-        ),
-        title: Text('Vender ${ativo.nome}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)));
+
+
+  Widget _headerCodigoAtivo() {
+    return _columnHeader('Código');
   }
 
-  Widget headerCodigoAtivo() {
-    return columnHeader('Código');
+  Widget _headerNomeAtivo() {
+    return _columnHeader('Nome');
   }
 
-  Widget headerNomeAtivo() {
-    return columnHeader('Nome');
-  }
-
-  Widget contentCodigoAtivo(Ativo ativo) {
+  Widget _contentCodigoAtivo(Ativo ativo) {
     return columnContent(ativo.ticker);
   }
 
-  Widget contentNomeAtivo(Ativo ativo) {
+  Widget _contentNomeAtivo(Ativo ativo) {
     return columnContent(ativo.nome);
   }
 
-  Expanded columnHeader(String title1) {
+  Widget _columnHeader(String title1) {
     return Expanded(
       child: Column(
         // align the text to the left instead of centered
@@ -202,14 +206,14 @@ class _CardAtivosState extends State<CardAtivos> {
         children: <Widget>[
           Text(
             title1,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Expanded columnContent(String title1) {
+  Widget columnContent(String title1) {
     return Expanded(
       child: Column(
         // align the text to the left instead of centered

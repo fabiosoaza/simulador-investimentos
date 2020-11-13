@@ -1,3 +1,4 @@
+import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
@@ -41,6 +42,16 @@ class Carteira {
     var valorCompra = calcularValorCompraCarteira().valorAsDouble();
     var rentabilidade = valorCompra == 0 ? 0.toDouble() : calcularLucro().multiplicar(100.toDouble()).dividir(valorCompra).valorAsDouble();
     return rentabilidade;
+  }
+
+  AtivoCarteira findAtivoCarteira(Ativo ativo){
+    var ativoCarteira;
+    _ativosCarteiraCotacao.forEach((ativoCarteiraCotacao) {
+      if(ativoCarteiraCotacao.ativoCarteira.ativo.ticker == ativo.ticker){
+        ativoCarteira = ativoCarteiraCotacao.ativoCarteira;
+      }
+    });
+    return ativoCarteira;
   }
 
 

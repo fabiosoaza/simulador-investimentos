@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
+import 'package:simulador_investimentos/core/model/domain/carteira.dart';
+import 'package:simulador_investimentos/core/model/domain/tipo_ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
 import 'package:simulador_investimentos/core/model/domain/validador_valor.dart';
+import 'package:simulador_investimentos/core/model/domain/validador_venda_ativo_carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
@@ -32,6 +35,7 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   TipoOperacao _tipoOperacao;
   GlobalKey<FormState> _formularioKey = GlobalKey<FormState>();
   Ativo _ativo;
+  Carteira _carteira;
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
@@ -45,12 +49,15 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   void initState() {
     super.initState();
     resetFields();
+    _applicationContext.carteiraRepository
+        .carregar()
+        .then((value) => _carteira = value);
   }
 
   void resetFields() {
-    var valorDefault = '0.0';
-    _precoAtivo.text = valorDefault;
-    _quantidade.text = valorDefault;
+    var valorDefault = 0;
+    _precoAtivo.text = valorDefault.toStringAsFixed(numeroCasasDecimaisPreco());
+    _quantidade.text = valorDefault.toStringAsFixed(numeroCasasDecimaisQuantidade());
   }
 
   @override
@@ -64,12 +71,8 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
     var quantidade = extrairQuantidade();
     var ativoCarteira = AtivoCarteira.novo(_ativo, extrairPrecoMedio(), quantidade);
     executarOperacao(ativoCarteira);
-    setState(()  {
-      //recarrega cache de cotações
-      NavigationUtils.replaceWithMercado(context).then((value) {
-        NavigationUtils.showToast(context, "Operação efetuada com sucesso.");
-      });
-    });
+    NavigationUtils.goBack(context);
+    NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
   }
 
   ValorMonetario extrairPrecoMedio() => ValorMonetario.brl(_precoAtivo.text);
@@ -80,8 +83,9 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
     var result = _tipoOperacao == TipoOperacao.COMPRA ? _applicationContext.ativoCarteiraRepository.adicionar(
         ativoCarteira) : _applicationContext.ativoCarteiraRepository.remover(
         ativoCarteira);
-    result.then((value) {
-      _applicationContext.cotacaoRepository.carregarCotacoes();
+        result.then((value) {
+            //recarrega cache de cotações
+           _applicationContext.cotacaoRepository.carregarCotacoes();
     });
   }
 
@@ -91,19 +95,27 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          buildTextFormField(
+          buildNumericTextField(
               label: "Preço médio(R\$)",
-              error: "Informe um preço válido(R\$)",
-              controller: _precoAtivo),
-          buildTextFormField(
+              validationFunction: _validadorValor("Informe um preço válido(R\$)"),
+              controller: _precoAtivo,
+              numeroCasasDecimais: numeroCasasDecimaisPreco()
+          ),
+          buildNumericTextField(
               label: "Quantidade",
-              error: "Informe uma quantidade",
-              controller: _quantidade),
+            validationFunction: _validadorQuantidade(),
+              controller: _quantidade,
+              numeroCasasDecimais: numeroCasasDecimaisQuantidade()
+          ),
           criarBotaoSalvar(),
         ],
       ),
     );
   }
+
+  int numeroCasasDecimaisQuantidade() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 0 : 4;
+
+  int numeroCasasDecimaisPreco() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 2 : 3;
 
   Widget criarBotaoSalvar() {
     return Padding(
@@ -130,23 +142,43 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
       _tipoOperacao == TipoOperacao.COMPRA ? "Comprar" : "Vender";
 
 
-  TextFormField buildTextFormField(
-      {TextEditingController controller, String error, String label}) {
+  TextFormField buildNumericTextField(
+      {TextEditingController controller, Function validationFunction, String label, int numeroCasasDecimais}) {
+        var regexp = numeroCasasDecimais == 0 ? r'^(\d+)': r'^(\d+)?\.?\d{0,'+numeroCasasDecimais.toString()+'}';
     return TextFormField(
       inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,3}')),
+        FilteringTextInputFormatter.allow(RegExp(regexp)),
       ],
-      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      keyboardType: TextInputType.numberWithOptions(decimal: numeroCasasDecimais !=0 ),
       decoration: InputDecoration(
           labelText: label, errorStyle: TextStyle(fontSize: 19)),
       controller: controller,
-      validator: (text) {
-        return ValidadorValor(text).validar() ? null : error;
-      },
+      validator: validationFunction,
       style: TextStyle(
         fontSize: 32,
         color: Colors.black87,
       ),
     );
+  }
+
+  Function _validadorValor(String error){
+    return (text) {
+      return ValidadorValor(text).validar() ? null : error;
+    };
+  }
+
+  Function _validadorQuantidade(){
+    return (text) {
+      if(!ValidadorValor(text).validar()){
+        return "Informe a quantidade";
+      }
+      if(_tipoOperacao == TipoOperacao.VENDA){
+        var validador = ValidadorVendaAtivoCarteira(text, _carteira.findAtivoCarteira(_ativo));
+        if (!validador.validar()) {
+          return "Quantidade não disponível";
+        }
+      }
+      return null;
+    };
   }
 }

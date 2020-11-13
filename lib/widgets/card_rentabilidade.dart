@@ -30,7 +30,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
 
   Future<void> reload() async {
     atualizarDadosView();
-    _carteira = await _applicationContext.ativoCotacaoRepository.carregar();
+    _carteira = await _applicationContext.carteiraRepository.carregar();
     var updateView = () {
       atualizarDadosView();
     };
