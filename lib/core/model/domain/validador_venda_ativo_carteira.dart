@@ -14,6 +14,6 @@ class ValidadorVendaAtivoCarteira {
         double.tryParse(_valor) == null ? 0 : double.tryParse(_valor);
     var quantidadeNaCarteira =
         _ativoCarteira == null ? 0 : _ativoCarteira.quantidade;
-    return quantidadeNaCarteira > quantidadeParaVenda;
+    return quantidadeNaCarteira >= quantidadeParaVenda;
   }
 }
