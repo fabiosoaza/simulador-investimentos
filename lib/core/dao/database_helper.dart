@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 
 import 'package:simulador_investimentos/core/dao/ativo_dao.dart';
 import 'package:simulador_investimentos/core/dao/ativo_carteira_dao.dart';
-import 'package:simulador_investimentos/core/model/domain/tipo_ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper; //SINGLETON

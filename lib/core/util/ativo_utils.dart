@@ -1,5 +1,5 @@
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
-import 'package:simulador_investimentos/core/model/domain/tipo_ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
 
 class AtivoUtils{
 

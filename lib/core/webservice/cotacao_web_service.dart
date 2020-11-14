@@ -5,7 +5,7 @@ import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/cotacao.dart';
 import 'package:simulador_investimentos/core/model/repository/cotacao_repository.dart';
-import 'package:simulador_investimentos/core/model/domain/tipo_ativo.dart';
+import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 
 class CotacaoWebService extends CotacaoRepository{
