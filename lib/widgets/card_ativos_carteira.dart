@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao.dart';
+import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
@@ -13,26 +14,18 @@ class CardAtivosCarteira extends StatefulWidget {
 
 class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
-  static final int CASAS_DECIMAIS = 2;
+   static const int CASAS_DECIMAIS = 2;
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
-  List<AtivoCarteiraCotacao> _ativoCarteiraCotacao =
-      List<AtivoCarteiraCotacao>();
+
+  Future<Carteira> _futureCarteira;
 
   @override
   void initState() {
     super.initState();
-    reload();
+    _futureCarteira = _applicationContext.carteiraRepository.carregar();
   }
 
-  Future<void> reload() async {
-    final carteira =
-        await _applicationContext.carteiraRepository.carregar();
-    var updateView = () {
-      this._ativoCarteiraCotacao = carteira.ativosCarteiraCotacao;
-    };
-    setState(updateView);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +35,119 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            tituloListagem(),
-            Expanded(child: listView()),
+            Expanded(child: FutureBuilder<Carteira>(
+                future: _futureCarteira,
+                builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
+                  return mainBlock(snapshot);
+                }
+            )),
           ],
         ),
       ),
     );
   }
 
-  Widget tituloListagem(){
+  Widget mainBlock(AsyncSnapshot<Carteira> snapshot) {
+    var widgets = <Widget>[
+      titleCard()
+    ];
+    var children = _widgetsChildren(snapshot);
+    widgets.addAll(children);
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      ),
+    );
+  }
 
+  Row titleCard() {
+    return Row(
+      children: <Widget>[
+        Icon(
+          Icons.layers,
+          size: 30,
+          color: kPrimaryColor,
+        ),
+        SizedBox(
+          width: 15,
+        ),
+        Text(
+          'Ativos em carteira',
+          style: TextStyle(
+            fontSize: 18,
+
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+  List<Widget> _widgetsChildren(AsyncSnapshot<Carteira> snapshot) {
+    List<Widget> children = [];
+    if(snapshot.hasData) {
+      children = [
+        SizedBox(
+          height: 15,
+        ),
+        Expanded(child: listView(snapshot.data))
+      ];
+    }else if(snapshot.hasError){
+      children = _widgetsError(snapshot);
+    }
+    else{
+      children = _widgetsLoading();
+    }
+    return children;
+  }
+
+  List<Widget> _widgetsError(AsyncSnapshot<Carteira> snapshot) {
+    return <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top:16.0),
+          child: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+        ),
+      ),
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
+        ),
+      )
+    ];
+  }
+
+  List<Widget> _widgetsLoading() {
+    return <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: SizedBox(
+            child: CircularProgressIndicator(),
+            width: 60,
+            height: 60,
+          ),
+        ),
+      ),
+      Center(
+        child: const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
+        ),
+      )
+    ];
+  }
+
+
+  Widget tituloListagem(){
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -82,15 +178,15 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
 
-  Widget listView() {
+  Widget listView(Carteira carteira) {
     return Container(
       child: new ListView.builder(
-        itemCount: _ativoCarteiraCotacao.length + 1,
+        itemCount: carteira.ativosCarteiraCotacao.length + 1,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return cardHeader();
           } else {
-            var ativo = _ativoCarteiraCotacao[index - 1];
+            var ativo = carteira.ativosCarteiraCotacao[index - 1];
             return cardRow(ativo);
           }
         },

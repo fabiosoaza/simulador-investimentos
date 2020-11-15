@@ -80,13 +80,11 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   double extrairQuantidade() => FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
 
   void executarOperacao(AtivoCarteira ativoCarteira) {
-    var result = _tipoOperacao == TipoOperacao.COMPRA ? _applicationContext.ativoCarteiraRepository.adicionar(
-        ativoCarteira) : _applicationContext.ativoCarteiraRepository.remover(
-        ativoCarteira);
-        result.then((value) {
-            //recarrega cache de cotações
-           _applicationContext.cotacaoRepository.carregarCotacoes();
-    });
+    if (_tipoOperacao == TipoOperacao.COMPRA) {
+      _applicationContext.ativoCarteiraRepository.adicionar(ativoCarteira);
+    } else {
+      _applicationContext.ativoCarteiraRepository.remover(ativoCarteira);
+    }
   }
 
   Form buildForm() {

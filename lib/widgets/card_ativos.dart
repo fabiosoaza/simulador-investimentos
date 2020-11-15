@@ -21,10 +21,10 @@ class CardAtivos extends StatefulWidget {
 class _CardAtivosState extends State<CardAtivos> {
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
-  List<Ativo> _ativos = List<Ativo>();
-
   String _titulo;
   String _tipoAtivo;
+
+  Future<List<Ativo>> _futureAtivos;
 
   _CardAtivosState(String tipoAtivo, String titulo) {
     this._tipoAtivo = tipoAtivo;
@@ -34,17 +34,9 @@ class _CardAtivosState extends State<CardAtivos> {
   @override
   void initState() {
     super.initState();
-    reload();
+    _futureAtivos = _applicationContext.ativoRepository.listarPorTipo(_tipoAtivo);
   }
 
-  Future<void> reload() async {
-    final ativos =
-        await _applicationContext.ativoRepository.listarPorTipo(_tipoAtivo);
-    var updateView = () {
-      this._ativos = ativos;
-    };
-    setState(updateView);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +47,77 @@ class _CardAtivosState extends State<CardAtivos> {
         child: Column(
           children: [
             tituloListagem(),
-            Expanded(child: listView()),
+            Expanded(child:
+            FutureBuilder<List<Ativo>>(
+                future: _futureAtivos,
+                builder: (BuildContext context, AsyncSnapshot<List<Ativo>> snapshot)  {
+                  return  mainBlock(snapshot);
+                }
+            ))
+
           ],
         ),
       ),
     );
+  }
+
+  Widget mainBlock(AsyncSnapshot<List<Ativo>> snapshot) {
+    var widget;
+    if(snapshot.hasData) {
+      widget = listView(snapshot.data);
+    }
+    else if(snapshot.hasError){
+      widget = _widgetsError();
+    }
+    else{
+      widget = _widgetsLoading();
+    }
+    return widget;
+  }
+
+  Widget _widgetsError() {
+    var widgets = <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top:16.0),
+          child: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+        ),
+      ),
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
+        ),
+      )
+    ];
+    return Column(children: widgets);
+  }
+
+
+  Widget _widgetsLoading() {
+    var widgets = <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: SizedBox(
+            child: CircularProgressIndicator(),
+            width: 60,
+            height: 60,
+          ),
+        ),
+      ),
+      Center(
+        child: const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
+        ),
+      )
+    ];
+    return Column(children: widgets);
   }
 
   Widget tituloListagem() {
@@ -89,15 +147,15 @@ class _CardAtivosState extends State<CardAtivos> {
             ]));
   }
 
-  Widget listView() {
+  Widget listView(List<Ativo> ativos) {
     return Container(
       child: new ListView.builder(
-        itemCount: _ativos.length + 1,
+        itemCount: ativos.length + 1,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return cardHeader();
           } else {
-            var ativo = _ativos[index - 1];
+            var ativo = ativos[index - 1];
             return cardRow(ativo);
           }
         },

@@ -14,43 +14,24 @@ class CardRentabilidade extends StatefulWidget {
 class _CardRentabilidadeState extends State<CardRentabilidade> {
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
-  String _patrimonioFormatado;
-  String _rentabilidadeFormatada;
-  String _lucroFormatado;
 
-  static final int CASAS_DECIMAIS = 2;
-  Carteira _carteira = Carteira.nova();
+  static const  int CASAS_DECIMAIS = 2;
+  Future<Carteira> _futureCarteira;
+
 
   @override
   void initState() {
     super.initState();
-    reload();
+    _futureCarteira = _applicationContext.carteiraRepository.carregar();
   }
 
 
-  Future<void> reload() async {
-    atualizarDadosView();
-    _carteira = await _applicationContext.carteiraRepository.carregar();
-    var updateView = () {
-      atualizarDadosView();
-    };
-    setState(updateView);
-
+  Color _corValorRentabilidade(Carteira carteira){
+    return UiUtils.getColorByValor(carteira.calcularRentabilidadePercentual());
   }
 
-  void atualizarDadosView() {
-    _patrimonioFormatado = formatarValorMonetario(_carteira.calcularValorAtualCarteira());
-    _rentabilidadeFormatada = formatarPorcentagem(_carteira.calcularRentabilidadePercentual());
-    _lucroFormatado = formatarValorMonetario(_carteira.calcularLucro());
-  }
-
-
-  Color _corValorRentabilidade(){
-    return UiUtils.getColorByValor(_carteira.calcularRentabilidadePercentual());
-  }
-
-  Color _corValorLucro(){
-    return UiUtils.getColorByValor(_carteira.calcularLucro().valorAsDouble());
+  Color _corValorLucro(Carteira carteira){
+    return UiUtils.getColorByValor(carteira.calcularLucro().valorAsDouble());
   }
 
   String formatarPorcentagem(double valor){
@@ -68,39 +49,93 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            Expanded(child: mainBlock()),
+            Expanded(child: FutureBuilder<Carteira>(
+                future: _futureCarteira,
+                builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
+                  return mainBlock(snapshot);
+                }
+            )),
           ],
         ),
       ),
     );
   }
 
-  Padding mainBlock() {
+
+  Widget mainBlock(AsyncSnapshot<Carteira> snapshot) {
+    var widgets = <Widget>[
+      titleCard()
+    ];
+    var children = _widgetsChildren(snapshot);
+    widgets.addAll(children);
     return Padding(
       padding: const EdgeInsets.all(30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.account_balance_wallet,
-                size: 30,
-                color: kPrimaryColor,
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Text(
-                'Carteira de Investimentos',
-                style: TextStyle(
-                  fontSize: 18,
+        children: widgets,
+      ),
+    );
+  }
 
+  List<Widget> _widgetsChildren(AsyncSnapshot<Carteira> snapshot) {
+    var children;
+    if(snapshot.hasData){
+      children = _widgetsSuccess(snapshot.data);
+    }else if (snapshot.hasError) {
+      children = _widgetsError(snapshot);
+    } else {
+      children = _widgetsLoading();
+    }
+    return children;
+  }
 
-                ),
-              ),
-            ],
+  List<Widget> _widgetsLoading() {
+    return <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: SizedBox(
+            child: CircularProgressIndicator(),
+            width: 60,
+            height: 60,
           ),
+        ),
+      ),
+      Center(
+        child: const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
+        ),
+      )
+    ];
+  }
+
+  List<Widget> _widgetsError(AsyncSnapshot<Carteira> snapshot) {
+    return <Widget>[
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top:16.0),
+          child: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+        ),
+      ),
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
+        ),
+      )
+    ];
+  }
+
+  List<Widget> _widgetsSuccess(Carteira carteira) {
+    var patrimonioFormatado = formatarValorMonetario(carteira.calcularValorAtualCarteira());
+   var rentabilidadeFormatada = formatarPorcentagem(carteira.calcularRentabilidadePercentual());
+   var lucroFormatado = formatarValorMonetario(carteira.calcularLucro());
+    return  <Widget>[
           SizedBox(
             height: 15,
           ),
@@ -114,7 +149,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             height: 5,
           ),
           Text(
-            _patrimonioFormatado,
+            patrimonioFormatado,
             style: TextStyle(
                 fontSize: 28,
                 color: kTitleAccentSecundaryColor,
@@ -133,10 +168,10 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             height: 5,
           ),
           Text(
-            _rentabilidadeFormatada,
+            rentabilidadeFormatada,
             style: TextStyle(
                 fontSize: 28,
-                color: _corValorRentabilidade(),
+                color: _corValorRentabilidade(carteira),
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(
@@ -147,17 +182,39 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
               text: 'Lucro/Prejuízo ',
               children: [
                 TextSpan(
-                    text: _lucroFormatado,
+                    text: lucroFormatado,
                     style: TextStyle(
-                      color: _corValorLucro(),
+                      color: _corValorLucro(carteira),
                     )),
               ],
               style: TextStyle(fontSize: 18),
             ),
           ),
           Spacer(),
-        ],
-      ),
-    );
+        ];
+
+  }
+
+  Row titleCard() {
+    return Row(
+          children: <Widget>[
+            Icon(
+              Icons.account_balance_wallet,
+              size: 30,
+              color: kPrimaryColor,
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            Text(
+              'Carteira de Investimentos',
+              style: TextStyle(
+                fontSize: 18,
+
+
+              ),
+            ),
+          ],
+        );
   }
 }

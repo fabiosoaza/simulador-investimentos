@@ -32,7 +32,7 @@ class AtivoDao {
         await _databaseHelper.queryAllByFilter(NOME_TABELA, {COLUNA_TIPO: tipo});
     rows.forEach((linha) {
       var ativo = Ativo(
-          linha[COLUNA_ID], linha[COLUNA_TICKER], linha[COLUNA_TIPO], linha[COLUNA_NOME]);
+          linha[COLUNA_ID], linha[COLUNA_TICKER], linha[COLUNA_TIPO], linha[COLUNA_NOME], linha[COLUNA_MERCADO]);
       ativos.add(ativo);
     });
     return ativos;
@@ -44,7 +44,7 @@ class AtivoDao {
     await _databaseHelper.queryAll(NOME_TABELA);
     rows.forEach((linha) {
       var ativo = Ativo(
-          linha[COLUNA_ID], linha[COLUNA_TICKER], linha[COLUNA_TIPO], linha[COLUNA_NOME]);
+          linha[COLUNA_ID], linha[COLUNA_TICKER], linha[COLUNA_TIPO], linha[COLUNA_NOME], linha[COLUNA_MERCADO]);
       ativos.add(ativo);
     });
     return ativos;
