@@ -6,6 +6,7 @@ import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
+import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
 class CardAtivosCarteira extends StatefulWidget {
   @override
@@ -30,8 +31,13 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.0,
+      aspectRatio: 0.68,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
@@ -54,7 +60,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
     var children = _widgetsChildren(snapshot);
     widgets.addAll(children);
     return Padding(
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.only(top:5, left:15, right: 15, bottom: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: widgets,
@@ -62,25 +68,29 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
     );
   }
 
-  Row titleCard() {
-    return Row(
-      children: <Widget>[
-        Icon(
-          Icons.layers,
-          size: 30,
-          color: kPrimaryColor,
-        ),
-        SizedBox(
-          width: 15,
-        ),
-        Text(
-          'Ativos em carteira',
-          style: TextStyle(
-            fontSize: 18,
-
+  Widget titleCard() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            Icons.layers,
+            size: 30,
+            color: kPrimaryColor,
           ),
-        ),
-      ],
+          SizedBox(
+            width: 15,
+          ),
+          Text(
+            'Ativos em carteira',
+            style: TextStyle(
+              fontSize: 18,
+              color:kNighSky
+
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -105,45 +115,11 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
   List<Widget> _widgetsError(AsyncSnapshot<Carteira> snapshot) {
-    return <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top:16.0),
-          child: Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
-        ),
-      )
-    ];
+    return UiUtils.getErrorLoadingInfo();
   }
 
   List<Widget> _widgetsLoading() {
-    return <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: SizedBox(
-            child: CircularProgressIndicator(),
-            width: 60,
-            height: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: const Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
-        ),
-      )
-    ];
+    return UiUtils.getLoadingAnimation();
   }
 
 
@@ -167,7 +143,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
                 'Ativos em carteira',
                 style: TextStyle(
                   fontSize: 18,
-
+color:kNighSky,
 
                 ),
               ),
@@ -185,9 +161,11 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return cardHeader();
-          } else {
+          } else if (carteira.ativosCarteiraCotacao.isNotEmpty) {
             var ativo = carteira.ativosCarteiraCotacao[index - 1];
             return cardRow(ativo);
+          } else {
+            return cardNenhumAtivoCarteira();
           }
         },
       ),
@@ -203,6 +181,26 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
             headerCodigoAtivo(),
             headerPrecoMedio(),
             headerValorTotal(),
+          ],
+        ),
+      ),
+    );
+  }
+
+   Card cardNenhumAtivoCarteira() {
+     return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: <Widget>[
+            Column(
+              // align the text to the left instead of centered
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Nenhum ativo em carteira.',
+                    style: TextStyle(fontSize: 16, color: kNighSky))
+              ],
+            ),
           ],
         ),
       ),
@@ -265,7 +263,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
     var widgets = <Widget>[];
 
     for (var i = 0; i < titles.length; i++) {
-      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)) : Text(titles[i], style: TextStyle(fontWeight: FontWeight.bold));
+      var widget = i == 0 ? Text(titles[i], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kNighSky)) : Text(titles[i], style: TextStyle(fontWeight: FontWeight.bold, color: kNighSky));
       widgets.add(widget);
     }
     return Expanded(

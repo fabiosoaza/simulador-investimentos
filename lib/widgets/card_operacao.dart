@@ -33,8 +33,13 @@ class _CardOperacaoState extends State<CardOperacao> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 0.82,
+      aspectRatio: 0.85,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
@@ -65,7 +70,7 @@ class _CardOperacaoState extends State<CardOperacao> {
                 titulo(),
                 style: TextStyle(
                   fontSize: 18,
-
+                  color: kNighSky
                 ),
               ),
             ],

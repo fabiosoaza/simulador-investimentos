@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
+import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
 class CardAtivos extends StatefulWidget {
   String _tipoAtivo;
@@ -41,8 +43,13 @@ class _CardAtivosState extends State<CardAtivos> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.35,
+      aspectRatio: 1.40,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
@@ -64,7 +71,7 @@ class _CardAtivosState extends State<CardAtivos> {
   Widget mainBlock(AsyncSnapshot<List<Ativo>> snapshot) {
     var widget;
     if(snapshot.hasData) {
-      widget = listView(snapshot.data);
+      widget = _gridView(snapshot.data);
     }
     else if(snapshot.hasError){
       widget = _widgetsError();
@@ -76,53 +83,17 @@ class _CardAtivosState extends State<CardAtivos> {
   }
 
   Widget _widgetsError() {
-    var widgets = <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top:16.0),
-          child: Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
-        ),
-      )
-    ];
-    return Column(children: widgets);
+        return Column(children: UiUtils.getErrorLoadingInfo());
   }
 
 
   Widget _widgetsLoading() {
-    var widgets = <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: SizedBox(
-            child: CircularProgressIndicator(),
-            width: 60,
-            height: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: const Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
-        ),
-      )
-    ];
-    return Column(children: widgets);
+        return Column(children: UiUtils.getLoadingAnimation());
   }
 
   Widget tituloListagem() {
     return Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(top:22, left:22, right: 22),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -140,6 +111,7 @@ class _CardAtivosState extends State<CardAtivos> {
                     _titulo,
                     style: TextStyle(
                       fontSize: 18,
+                      color:kNighSky
                     ),
                   ),
                 ],
@@ -147,21 +119,85 @@ class _CardAtivosState extends State<CardAtivos> {
             ]));
   }
 
-  Widget listView(List<Ativo> ativos) {
+
+
+  Widget _gridView(List<Ativo> ativos) {
     return Container(
-      child: new ListView.builder(
-        itemCount: ativos.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return cardHeader();
-          } else {
-            var ativo = ativos[index - 1];
-            return cardRow(ativo);
-          }
-        },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Flexible(
+              child: GridView.builder(
+                physics: BouncingScrollPhysics(), // if you want IOS bouncing effect, otherwise remove this line
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),//change the number as you want
+                scrollDirection: Axis.horizontal,
+                itemCount: ativos.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _gridItem(ativos[index], index);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  Widget _gridItem(Ativo ativo, int index) {
+    return Container(
+      child: Card(
+        child: InkWell(
+          onTap: () {
+            showModalBottomSheet<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                      child: Wrap(children: <Widget>[
+                        _menuComprarAtivo(ativo),
+                        _menuVenderAtivo(ativo)
+
+                      ]
+                      )
+                  );
+                });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              children: <Widget>[
+                _gitem(ativo, index),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _gitem(Ativo ativo, int index) {
+    return Expanded(
+      child: Column(
+        // align the text to the left instead of centered
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Center(child: UiUtils.getLogo(ativo.logo)),
+          SizedBox(height: 10,),
+          Center(
+            child: Text(
+              ativo.ticker,
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+
+        ],
+      ),
+    );
+  }
+
+
+
 
   Card cardHeader() {
     return Card(
@@ -209,14 +245,14 @@ class _CardAtivosState extends State<CardAtivos> {
   Widget _menuComprarAtivo(Ativo ativo) {
     var operacao = TipoOperacao.COMPRA;
     var icon = Icons.add_shopping_cart;
-    var text = 'Comprar ${ativo.nome}';
+    var text = 'Comprar ${ativo.ticker}';
     return _menuItem(operacao, ativo, icon, text);
   }
 
   Widget _menuVenderAtivo(Ativo ativo) {
     var operacao = TipoOperacao.VENDA;
     var icon = Icons.remove_shopping_cart;
-    var text = 'Vender ${ativo.nome}';
+    var text = 'Vender ${ativo.ticker}';
     return _menuItem(operacao, ativo, icon, text);
   }
 
@@ -234,7 +270,7 @@ class _CardAtivosState extends State<CardAtivos> {
       ),
       title: Text(text,
           textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: kNighSky))
   );
   }
 
@@ -279,7 +315,7 @@ class _CardAtivosState extends State<CardAtivos> {
         children: <Widget>[
           Text(
             title1,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
           ),
         ],
       ),

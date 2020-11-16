@@ -109,9 +109,10 @@ class DatabaseHelper {
     var ticker = AtivoDao.COLUNA_TICKER;
     var tipo = AtivoDao.COLUNA_TIPO;
     var mercado = AtivoDao.COLUNA_MERCADO;
+    var logo = AtivoDao.COLUNA_LOGO;
 
     var sql = "CREATE TABLE $nomeTabela ($id  INTEGER PRIMARY KEY " +
-        "AUTOINCREMENT, $nomeAtivo TEXT, $ticker TEXT, $tipo TEXT, $mercado TEXT);";
+        "AUTOINCREMENT, $nomeAtivo TEXT, $ticker TEXT, $tipo TEXT, $mercado TEXT, $logo TEXT);";
     return sql;
   }
 
@@ -150,110 +151,110 @@ class DatabaseHelper {
     var tipoAtivo = AtivoConstants.TIPO_ACAO;
     var mercado = AtivoConstants.MERCADO_B3;
 
-    ativos.add(ativo("ABEV3", "AMBEV S/A", tipoAtivo, mercado));
-    ativos.add(ativo("AZUL4", "AZUL", tipoAtivo, mercado));
-    ativos.add(ativo("B3SA3", "B3", tipoAtivo, mercado));
-    ativos.add(ativo("BBAS3", "BRASIL", tipoAtivo, mercado));
-    ativos.add(ativo("BBDC3", "BRADESCO", tipoAtivo, mercado));
-    ativos.add(ativo("BBDC4", "BRADESCO", tipoAtivo, mercado));
-    ativos.add(ativo("BBSE3", "BBSEGURIDADE", tipoAtivo, mercado));
-    ativos.add(ativo("BEEF3", "MINERVA", tipoAtivo, mercado));
-    ativos.add(ativo("BPAC11", "BTGP BANCO", tipoAtivo, mercado));
-    ativos.add(ativo("BRAP4", "BRADESPAR", tipoAtivo, mercado));
-    ativos.add(ativo("BRDT3", "PETROBRAS BR", tipoAtivo, mercado));
-    ativos.add(ativo("BRFS3", "BRF SA", tipoAtivo, mercado));
-    ativos.add(ativo("BRKM5", "BRASKEM", tipoAtivo, mercado));
-    ativos.add(ativo("BRML3", "BR MALLS PAR", tipoAtivo, mercado));
-    ativos.add(ativo("BTOW3", "B2W DIGITAL", tipoAtivo, mercado));
-    ativos.add(ativo("CCRO3", "CCR SA", tipoAtivo, mercado));
-    ativos.add(ativo("CIEL3", "CIELO", tipoAtivo, mercado));
-    ativos.add(ativo("CMIG4", "CEMIG", tipoAtivo, mercado));
-    ativos.add(ativo("COGN3", "COGNA ON", tipoAtivo, mercado));
-    ativos.add(ativo("CPFE3", "CPFL ENERGIA", tipoAtivo, mercado));
-    ativos.add(ativo("CRFB3", "CARREFOUR BR", tipoAtivo, mercado));
-    ativos.add(ativo("CSAN3", "COSAN", tipoAtivo, mercado));
-    ativos.add(ativo("CSNA3", "SID NACIONAL", tipoAtivo, mercado));
-    ativos.add(ativo("CVCB3", "CVC BRASIL", tipoAtivo, mercado));
-    ativos.add(ativo("CYRE3", "CYRELA REALT", tipoAtivo, mercado));
-    ativos.add(ativo("ECOR3", "ECORODOVIAS", tipoAtivo, mercado));
-    ativos.add(ativo("EGIE3", "ENGIE BRASIL", tipoAtivo, mercado));
-    ativos.add(ativo("ELET3", "ELETROBRAS", tipoAtivo, mercado));
-    ativos.add(ativo("ELET6", "ELETROBRAS", tipoAtivo, mercado));
-    ativos.add(ativo("EMBR3", "EMBRAER", tipoAtivo, mercado));
-    ativos.add(ativo("ENBR3", "ENERGIAS BR", tipoAtivo, mercado));
-    ativos.add(ativo("ENGI11", "ENERGISA", tipoAtivo, mercado));
-    ativos.add(ativo("EQTL3", "EQUATORIAL", tipoAtivo, mercado));
-    ativos.add(ativo("EZTC3", "EZTEC", tipoAtivo, mercado));
-    ativos.add(ativo("FLRY3", "FLEURY", tipoAtivo, mercado));
-    ativos.add(ativo("GGBR4", "GERDAU", tipoAtivo, mercado));
-    ativos.add(ativo("GNDI3", "INTERMEDICA", tipoAtivo, mercado));
-    ativos.add(ativo("GOAU4", "GERDAU MET", tipoAtivo, mercado));
-    ativos.add(ativo("GOLL4", "GOL", tipoAtivo, mercado));
-    ativos.add(ativo("HAPV3", "HAPVIDA", tipoAtivo, mercado));
-    ativos.add(ativo("HGTX3", "CIA HERING", tipoAtivo, mercado));
-    ativos.add(ativo("HYPE3", "HYPERA", tipoAtivo, mercado));
-    ativos.add(ativo("IGTA3", "IGUATEMI", tipoAtivo, mercado));
-    ativos.add(ativo("IRBR3", "IRBBRASIL RE", tipoAtivo, mercado));
-    ativos.add(ativo("ITSA4", "ITAUSA", tipoAtivo, mercado));
-    ativos.add(ativo("ITUB4", "ITAUUNIBANCO", tipoAtivo, mercado));
-    ativos.add(ativo("JBSS3", "JBS", tipoAtivo, mercado));
-    ativos.add(ativo("KLBN11", "KLABIN S/A", tipoAtivo, mercado));
-    ativos.add(ativo("LAME4", "LOJAS AMERIC", tipoAtivo, mercado));
-    ativos.add(ativo("LREN3", "LOJAS RENNER", tipoAtivo, mercado));
-    ativos.add(ativo("MGLU3", "MAGAZ LUIZA", tipoAtivo, mercado));
-    ativos.add(ativo("MRFG3", "MARFRIG", tipoAtivo, mercado));
-    ativos.add(ativo("MRVE3", "MRV", tipoAtivo, mercado));
-    ativos.add(ativo("MULT3", "MULTIPLAN", tipoAtivo, mercado));
-    ativos.add(ativo("NTCO3", "GRUPO NATURA", tipoAtivo, mercado));
-    ativos.add(ativo("PCAR3", "P.ACUCAR-CBD", tipoAtivo, mercado));
-    ativos.add(ativo("PETR3", "PETROBRAS", tipoAtivo, mercado));
-    ativos.add(ativo("PETR4", "PETROBRAS", tipoAtivo, mercado));
-    ativos.add(ativo("PRIO3", "PETRORIO", tipoAtivo, mercado));
-    ativos.add(ativo("QUAL3", "QUALICORP", tipoAtivo, mercado));
-    ativos.add(ativo("RADL3", "RAIADROGASIL", tipoAtivo, mercado));
-    ativos.add(ativo("RAIL3", "RUMO S.A.", tipoAtivo, mercado));
-    ativos.add(ativo("RENT3", "LOCALIZA", tipoAtivo, mercado));
-    ativos.add(ativo("SANB11", "SANTANDER BR", tipoAtivo, mercado));
-    ativos.add(ativo("SBSP3", "SABESP", tipoAtivo, mercado));
-    ativos.add(ativo("SULA11", "SUL AMERICA", tipoAtivo, mercado));
-    ativos.add(ativo("SUZB3", "SUZANO S.A.", tipoAtivo, mercado));
-    ativos.add(ativo("TAEE11", "TAESA", tipoAtivo, mercado));
-    ativos.add(ativo("TIMS3", "TIM", tipoAtivo, mercado));
-    ativos.add(ativo("TOTS3", "TOTVS", tipoAtivo, mercado));
-    ativos.add(ativo("UGPA3", "ULTRAPAR", tipoAtivo, mercado));
-    ativos.add(ativo("USIM5", "USIMINAS", tipoAtivo, mercado));
-    ativos.add(ativo("VALE3", "VALE", tipoAtivo, mercado));
-    ativos.add(ativo("VIVT4", "TELEF BRASIL", tipoAtivo, mercado));
-    ativos.add(ativo("VVAR3", "VIAVAREJO", tipoAtivo, mercado));
-    ativos.add(ativo("WEGE3", "WEG", tipoAtivo, mercado));
-    ativos.add(ativo("YDUQ3", "YDUQS PART", tipoAtivo, mercado));
-
-    return ativos;
+    ativos.add(ativo("ABEV3", "AMBEV S/A", tipoAtivo, mercado , "abev3.png"));
+    ativos.add(ativo("AZUL4", "AZUL", tipoAtivo, mercado , "azul4.png"));
+    ativos.add(ativo("B3SA3", "B3", tipoAtivo, mercado , "b3sa3.png"));
+    ativos.add(ativo("BBAS3", "BRASIL", tipoAtivo, mercado , "bbas3.png"));
+    ativos.add(ativo("BBDC3", "BRADESCO", tipoAtivo, mercado , "bbdc4.png"));
+    ativos.add(ativo("BBDC4", "BRADESCO", tipoAtivo, mercado , "bbdc4.png"));
+    ativos.add(ativo("BBSE3", "BBSEGURIDADE", tipoAtivo, mercado, "bbse3.png"));
+    ativos.add(ativo("BEEF3", "MINERVA", tipoAtivo, mercado , "beef3.png"));
+    ativos.add(ativo("BPAC11", "BTGP BANCO", tipoAtivo, mercado , "bpac11.png"));
+    ativos.add(ativo("BRAP4", "BRADESPAR", tipoAtivo, mercado , "brap4.png"));
+    ativos.add(ativo("BRDT3", "PETROBRAS BR", tipoAtivo, mercado, "brdt3.png"));
+    ativos.add(ativo("BRFS3", "BRF SA", tipoAtivo, mercado , "brfs3.png"));
+    ativos.add(ativo("BRKM5", "BRASKEM", tipoAtivo, mercado , "brkm5.png"));
+    ativos.add(ativo("BRML3", "BR MALLS PAR", tipoAtivo, mercado, "brml3.png"));
+    ativos.add(ativo("BTOW3", "B2W DIGITAL", tipoAtivo, mercado , "btow3.png"));
+    ativos.add(ativo("CCRO3", "CCR SA", tipoAtivo, mercado , "ccro3.png"));
+    ativos.add(ativo("CIEL3", "CIELO", tipoAtivo, mercado , "ciel3.png"));
+    ativos.add(ativo("CMIG4", "CEMIG", tipoAtivo, mercado , "cmig4.png"));
+    ativos.add(ativo("COGN3", "COGNA ON", tipoAtivo, mercado , "cogn3.png"));
+    ativos.add(ativo("CPFE3", "CPFL ENERGIA", tipoAtivo, mercado, "cpfe3.png"));
+    ativos.add(ativo("CRFB3", "CARREFOUR BR", tipoAtivo, mercado, "crfb3.png"));
+    ativos.add(ativo("CSAN3", "COSAN", tipoAtivo, mercado , "csan3.png"));
+    ativos.add(ativo("CSNA3", "SID NACIONAL", tipoAtivo, mercado, "csna3.png"));
+    ativos.add(ativo("CVCB3", "CVC BRASIL", tipoAtivo, mercado, "cvcb3.png"));
+    ativos.add(ativo("CYRE3", "CYRELA REALT", tipoAtivo, mercado, "cyre3.png"));
+    ativos.add(ativo("ECOR3", "ECORODOVIAS", tipoAtivo, mercado , "ecor3.png"));
+    ativos.add(ativo("EGIE3", "ENGIE BRASIL", tipoAtivo, mercado, "egie3.png"));
+    ativos.add(ativo("ELET3", "ELETROBRAS", tipoAtivo, mercado, "elet3.png"));
+    ativos.add(ativo("ELET6", "ELETROBRAS", tipoAtivo, mercado, "elet3.png"));
+    ativos.add(ativo("EMBR3", "EMBRAER", tipoAtivo, mercado , "embr3.png"));
+    ativos.add(ativo("ENBR3", "ENERGIAS BR", tipoAtivo, mercado , "enbr3.png"));
+    ativos.add(ativo("ENGI11", "ENERGISA", tipoAtivo, mercado , "engi11.png"));
+    ativos.add(ativo("EQTL3", "EQUATORIAL", tipoAtivo, mercado, "eqtl3.png"));
+    ativos.add(ativo("EZTC3", "EZTEC", tipoAtivo, mercado , "eztc3.png"));
+    ativos.add(ativo("FLRY3", "FLEURY", tipoAtivo, mercado , "flry3.png"));
+    ativos.add(ativo("GGBR4", "GERDAU", tipoAtivo, mercado , "ggbr4.png"));
+    ativos.add(ativo("GNDI3", "INTERMEDICA", tipoAtivo, mercado , "gndi3.png"));
+    ativos.add(ativo("GOAU4", "GERDAU MET", tipoAtivo, mercado, "ggbr4.png"));
+    ativos.add(ativo("GOLL4", "GOL", tipoAtivo, mercado , "goll4.png"));
+    ativos.add(ativo("HAPV3", "HAPVIDA", tipoAtivo, mercado , "hapv3.png"));
+    ativos.add(ativo("HGTX3", "CIA HERING", tipoAtivo, mercado, "hgtx3.png"));
+    ativos.add(ativo("HYPE3", "HYPERA", tipoAtivo, mercado , "hype3.png"));
+    ativos.add(ativo("IGTA3", "IGUATEMI", tipoAtivo, mercado , "igta3.png"));
+    ativos.add(ativo("IRBR3", "IRBBRASIL RE", tipoAtivo, mercado, "irbr3.png"));
+    ativos.add(ativo("ITSA4", "ITAUSA", tipoAtivo, mercado , "itsa4.png"));
+    ativos.add(ativo("ITUB4", "ITAUUNIBANCO", tipoAtivo, mercado, "itub4.png"));
+    ativos.add(ativo("JBSS3", "JBS", tipoAtivo, mercado , "jbss3.png"));
+    ativos.add(ativo("KLBN11", "KLABIN S/A", tipoAtivo, mercado , "klbn11.png"));
+    ativos.add(ativo("LAME4", "LOJAS AMERIC", tipoAtivo, mercado, "lame4.png"));
+    ativos.add(ativo("LREN3", "LOJAS RENNER", tipoAtivo, mercado, "lren3.png"));
+    ativos.add(ativo("MGLU3", "MAGAZ LUIZA", tipoAtivo, mercado , "mglu3.png"));
+    ativos.add(ativo("MRFG3", "MARFRIG", tipoAtivo, mercado , "mrfg3.png"));
+    ativos.add(ativo("MRVE3", "MRV", tipoAtivo, mercado , "mrve3.png"));
+    ativos.add(ativo("MULT3", "MULTIPLAN", tipoAtivo, mercado , "mult3.png"));
+    ativos.add(ativo("NTCO3", "GRUPO NATURA", tipoAtivo, mercado, "ntco3.png"));
+    ativos.add(ativo("PCAR3", "P.ACUCAR-CBD", tipoAtivo, mercado, "pcar3.png"));
+    ativos.add(ativo("PETR3", "PETROBRAS", tipoAtivo, mercado , "petr4.png"));
+    ativos.add(ativo("PETR4", "PETROBRAS", tipoAtivo, mercado , "petr4.png"));
+    ativos.add(ativo("PRIO3", "PETRORIO", tipoAtivo, mercado , "prio3.png"));
+    ativos.add(ativo("QUAL3", "QUALICORP", tipoAtivo, mercado , "qual3.png"));
+    ativos.add(ativo("RADL3", "RAIADROGASIL", tipoAtivo, mercado, "radl3.png"));
+    ativos.add(ativo("RAIL3", "RUMO S.A.", tipoAtivo, mercado , "rail3.png"));
+    ativos.add(ativo("RENT3", "LOCALIZA", tipoAtivo, mercado , "rent3.png"));
+    ativos.add(ativo("SANB11", "SANTANDER BR", tipoAtivo, mercado , "sanb11.png"));
+    ativos.add(ativo("SBSP3", "SABESP", tipoAtivo, mercado , "sbsp3.png"));
+    ativos.add(ativo("SULA11", "SUL AMERICA", tipoAtivo, mercado, "sula11.png"));
+    ativos.add(ativo("SUZB3", "SUZANO S.A.", tipoAtivo, mercado , "suzb3.png"));
+    ativos.add(ativo("TAEE11", "TAESA", tipoAtivo, mercado , "taee11.png"));
+    ativos.add(ativo("TIMS3", "TIM", tipoAtivo, mercado , "timp3.png"));
+    ativos.add(ativo("TOTS3", "TOTVS", tipoAtivo, mercado , "tots3.png"));
+    ativos.add(ativo("UGPA3", "ULTRAPAR", tipoAtivo, mercado , "ugpa3.png"));
+    ativos.add(ativo("USIM5", "USIMINAS", tipoAtivo, mercado , "usim5.png"));
+    ativos.add(ativo("VALE3", "VALE", tipoAtivo, mercado , "vale3.png"));
+    ativos.add(ativo("VIVT4", "TELEF BRASIL", tipoAtivo, mercado, "vivt4.png"));
+    ativos.add(ativo("VVAR3", "VIAVAREJO", tipoAtivo, mercado , "vvar3.png"));
+    ativos.add(ativo("WEGE3", "WEG", tipoAtivo, mercado , "wege3.png"));
+    ativos.add(ativo("YDUQ3", "YDUQS PART", tipoAtivo, mercado, "yduq3.png"));
+        return ativos;
   }
 
   List<Map<String, dynamic>> _criptomoedas(){
     var ativos = <Map<String, dynamic>>[];
     var tipoAtivo = AtivoConstants.TIPO_CRYPTOMOEDA;
     var mercado = AtivoConstants.MERCADO_BITCOIN;
-    ativos.add(ativo("BCH",  " Bitcoin Cash", tipoAtivo, mercado) );
-    ativos.add(ativo("BTC",  " Bitcoin", tipoAtivo, mercado) );
-    ativos.add(ativo("CHZ",  " Chiliz", tipoAtivo, mercado) );
-    ativos.add(ativo("ETH",  " Ethereum", tipoAtivo, mercado) );
-    ativos.add(ativo("LTC",  " Litecoin", tipoAtivo, mercado) );
-    ativos.add(ativo("PAXG",  " PAX Gold", tipoAtivo, mercado) );
-    ativos.add(ativo("USDC",  " USD Coin", tipoAtivo, mercado) );
-    ativos.add(ativo("WBX",  " WiBX", tipoAtivo, mercado) );
-    ativos.add(ativo("XRP",  " XRP", tipoAtivo, mercado) );
+    ativos.add(ativo("BCH",  " Bitcoin Cash", tipoAtivo, mercado, "bch.png") );
+    ativos.add(ativo("BTC",  " Bitcoin", tipoAtivo, mercado, "btc.png") );
+    ativos.add(ativo("CHZ",  " Chiliz", tipoAtivo, mercado, "chz.png") );
+    ativos.add(ativo("ETH",  " Ethereum", tipoAtivo, mercado, "eth.png") );
+    ativos.add(ativo("LTC",  " Litecoin", tipoAtivo, mercado, "ltc.png") );
+    ativos.add(ativo("PAXG",  " PAX Gold", tipoAtivo, mercado, "paxg.png") );
+    ativos.add(ativo("USDC",  " USD Coin", tipoAtivo, mercado, "usdc.png") );
+    ativos.add(ativo("WBX",  " WiBX", tipoAtivo, mercado, "wbx.png") );
+    ativos.add(ativo("XRP",  " Ripple", tipoAtivo, mercado, "xrp.png") );
 
     return ativos;
   }
 
-  Map<String, dynamic> ativo(String ticker, String nome, String tipo, String mercado) {
+  Map<String, dynamic> ativo(String ticker, String nome, String tipo, String mercado, String logo) {
     return {
     AtivoDao.COLUNA_TICKER: ticker,
     AtivoDao.COLUNA_NOME: nome,
     AtivoDao.COLUNA_TIPO: tipo,
-    AtivoDao.COLUNA_MERCADO: mercado
+    AtivoDao.COLUNA_MERCADO: mercado,
+    AtivoDao.COLUNA_LOGO: logo
   };
   }
 }

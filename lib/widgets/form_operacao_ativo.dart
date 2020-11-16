@@ -149,7 +149,7 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
       ],
       keyboardType: TextInputType.numberWithOptions(decimal: numeroCasasDecimais !=0 ),
       decoration: InputDecoration(
-          labelText: label, errorStyle: TextStyle(fontSize: 19)),
+          labelText: label, errorStyle: TextStyle(fontSize: 19, color: kOperacaoVendaColor)),
       controller: controller,
       validator: validationFunction,
       style: TextStyle(

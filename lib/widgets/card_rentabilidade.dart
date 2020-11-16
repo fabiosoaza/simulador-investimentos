@@ -44,8 +44,13 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.35,
+      aspectRatio: 0.68,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
@@ -68,6 +73,11 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
     ];
     var children = _widgetsChildren(snapshot);
     widgets.addAll(children);
+    widgets.add( SizedBox(
+      height: 15,
+    ),
+        );
+    widgets.add( new Divider(color: kNighSky,));
     return Padding(
       padding: const EdgeInsets.all(30),
       child: Column(
@@ -90,45 +100,11 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
   }
 
   List<Widget> _widgetsLoading() {
-    return <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: SizedBox(
-            child: CircularProgressIndicator(),
-            width: 60,
-            height: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: const Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text('Buscando informações...', style: TextStyle(color:kPrimaryColor),),
-        ),
-      )
-    ];
+    return UiUtils.getLoadingAnimation();
   }
 
   List<Widget> _widgetsError(AsyncSnapshot<Carteira> snapshot) {
-    return <Widget>[
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top:16.0),
-          child: Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          ),
-        ),
-      ),
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Text('Falha ao buscar informações', style: TextStyle(color:kPrimaryColor)),
-        ),
-      )
-    ];
+    return UiUtils.getErrorLoadingInfo();
   }
 
   List<Widget> _widgetsSuccess(Carteira carteira) {
@@ -190,7 +166,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
               style: TextStyle(fontSize: 18),
             ),
           ),
-          Spacer(),
+
         ];
 
   }
@@ -210,7 +186,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
               'Carteira de Investimentos',
               style: TextStyle(
                 fontSize: 18,
-
+                color: kNighSky
 
               ),
             ),

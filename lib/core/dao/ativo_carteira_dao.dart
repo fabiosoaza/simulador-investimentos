@@ -42,12 +42,12 @@ class AtivoCarteiraDao {
 
   Future<List<AtivoCarteira>> listarAtivosCarteira() async {
     var ativos = List<AtivoCarteira>();
-    var sql = "SELECT c.$COLUNA_ID, c.$COLUNA_ATIVO_ID, c.$COLUNA_QUANTIDADE, c.$COLUNA_PRECO_MEDIO, a.${AtivoDao.COLUNA_NOME}, a.${AtivoDao.COLUNA_TICKER}, a.${AtivoDao.COLUNA_TIPO} , a.${AtivoDao.COLUNA_MERCADO} FROM $NOME_TABELA c INNER JOIN ${AtivoDao.NOME_TABELA} a"
+    var sql = "SELECT c.$COLUNA_ID, c.$COLUNA_ATIVO_ID, c.$COLUNA_QUANTIDADE, c.$COLUNA_PRECO_MEDIO, a.${AtivoDao.COLUNA_NOME}, a.${AtivoDao.COLUNA_TICKER}, a.${AtivoDao.COLUNA_TIPO} , a.${AtivoDao.COLUNA_MERCADO}, a.${AtivoDao.COLUNA_LOGO} FROM $NOME_TABELA c INNER JOIN ${AtivoDao.NOME_TABELA} a"
         +" ON a.${AtivoDao.COLUNA_ID} = c.$COLUNA_ATIVO_ID ";
     final rows =    await _databaseHelper.query(sql);
     rows.forEach((linha) {
       var ativo = Ativo(
-          linha[COLUNA_ATIVO_ID], linha[AtivoDao.COLUNA_TICKER], linha[AtivoDao.COLUNA_TIPO], linha[AtivoDao.COLUNA_NOME], linha[AtivoDao.COLUNA_MERCADO]);
+          linha[COLUNA_ATIVO_ID], linha[AtivoDao.COLUNA_TICKER], linha[AtivoDao.COLUNA_TIPO], linha[AtivoDao.COLUNA_NOME], linha[AtivoDao.COLUNA_MERCADO], linha[AtivoDao.COLUNA_LOGO]);
       var valor = ValorMonetario.brl(linha[COLUNA_PRECO_MEDIO].toString());
       var ativoCarteira = AtivoCarteira(linha[COLUNA_ID], ativo, valor, linha[COLUNA_QUANTIDADE]);
       ativos.add(ativoCarteira);
@@ -56,14 +56,14 @@ class AtivoCarteiraDao {
   }
 
   Future<AtivoCarteira> carregarAtivoCarteiraPorCodigo(String ticker) async {
-    var sql = "SELECT  c.$COLUNA_ID, c.$COLUNA_ATIVO_ID, c.$COLUNA_QUANTIDADE, c.$COLUNA_PRECO_MEDIO, a.${AtivoDao.COLUNA_NOME}, a.${AtivoDao.COLUNA_TICKER}, a.${AtivoDao.COLUNA_TIPO} , a.${AtivoDao.COLUNA_MERCADO} FROM $NOME_TABELA c INNER JOIN ${AtivoDao.NOME_TABELA} a"
+    var sql = "SELECT  c.$COLUNA_ID, c.$COLUNA_ATIVO_ID, c.$COLUNA_QUANTIDADE, c.$COLUNA_PRECO_MEDIO, a.${AtivoDao.COLUNA_NOME}, a.${AtivoDao.COLUNA_TICKER}, a.${AtivoDao.COLUNA_TIPO} , a.${AtivoDao.COLUNA_MERCADO}, a.${AtivoDao.COLUNA_LOGO}  FROM $NOME_TABELA c INNER JOIN ${AtivoDao.NOME_TABELA} a"
         +" ON a.${AtivoDao.COLUNA_ID} = c.$COLUNA_ATIVO_ID "
             " WHERE a.${AtivoDao.COLUNA_TICKER} = ?";
     final rows =    await _databaseHelper.query(sql, [ticker]);
     if(rows.isNotEmpty){
       var linha = rows[0];
       var ativo = Ativo(
-          linha[COLUNA_ATIVO_ID], linha[AtivoDao.COLUNA_TICKER], linha[AtivoDao.COLUNA_TIPO], linha[AtivoDao.COLUNA_NOME], linha[AtivoDao.COLUNA_MERCADO]);
+          linha[COLUNA_ATIVO_ID], linha[AtivoDao.COLUNA_TICKER], linha[AtivoDao.COLUNA_TIPO], linha[AtivoDao.COLUNA_NOME], linha[AtivoDao.COLUNA_MERCADO], linha[AtivoDao.COLUNA_LOGO]);
       var valor = ValorMonetario.brl(linha[COLUNA_PRECO_MEDIO].toString());
       var ativoCarteira = AtivoCarteira(linha[COLUNA_ID], ativo, valor, linha[COLUNA_QUANTIDADE]);
       return ativoCarteira;

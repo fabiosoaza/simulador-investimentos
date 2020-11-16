@@ -13,13 +13,13 @@ class PersonIdentification extends StatelessWidget {
 
           children: <Widget>[
             Image.asset("assets/coin.png",
-              width: 50,
+              width: 40,
               color: Colors.white,
             )
             ,
             SizedBox(width: 10,),
             Text("Simulador de Carteira",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,),
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold,),
             )
           ],
         ),
