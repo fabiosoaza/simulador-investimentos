@@ -70,20 +70,23 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   void salvar() {
     var quantidade = extrairQuantidade();
     var ativoCarteira = AtivoCarteira.novo(_ativo, extrairPrecoMedio(), quantidade);
-    executarOperacao(ativoCarteira);
-    NavigationUtils.goBack(context);
-    NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
+    executarOperacao(ativoCarteira).whenComplete((){
+      NavigationUtils.goBack(context);
+      NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
+    });
+
+
   }
 
   ValorMonetario extrairPrecoMedio() => ValorMonetario.brl(_precoAtivo.text);
 
   double extrairQuantidade() => FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
 
-  void executarOperacao(AtivoCarteira ativoCarteira) {
+  Future<void> executarOperacao(AtivoCarteira ativoCarteira) async{
     if (_tipoOperacao == TipoOperacao.COMPRA) {
-      _applicationContext.ativoCarteiraRepository.adicionar(ativoCarteira);
+      return _applicationContext.ativoCarteiraRepository.adicionar(ativoCarteira);
     } else {
-      _applicationContext.ativoCarteiraRepository.remover(ativoCarteira);
+      return _applicationContext.ativoCarteiraRepository.remover(ativoCarteira);
     }
   }
 

@@ -15,7 +15,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
-  static const  int CASAS_DECIMAIS = 2;
+  static const  int _CASAS_DECIMAIS = 2;
   Future<Carteira> _futureCarteira;
 
 
@@ -25,22 +25,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
     _futureCarteira = _applicationContext.carteiraRepository.carregar();
   }
 
-
-  Color _corValorRentabilidade(Carteira carteira){
-    return UiUtils.getColorByValor(carteira.calcularRentabilidadePercentual());
-  }
-
-  Color _corValorLucro(Carteira carteira){
-    return UiUtils.getColorByValor(carteira.calcularLucro().valorAsDouble());
-  }
-
-  String formatarPorcentagem(double valor){
-    return FormatadorNumeros().formatarPorcentagem(valor, CASAS_DECIMAIS)+'%';
-  }
-
-  String formatarValorMonetario(ValorMonetario valor) => valor.valorFormatadoComCasasDecimais(CASAS_DECIMAIS);
-
-
+  String _formatarValorMonetario(ValorMonetario valor) => valor.valorFormatadoComCasasDecimais(_CASAS_DECIMAIS);
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -57,7 +42,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             Expanded(child: FutureBuilder<Carteira>(
                 future: _futureCarteira,
                 builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
-                  return mainBlock(snapshot);
+                  return _mainBlock(snapshot);
                 }
             )),
           ],
@@ -67,9 +52,9 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
   }
 
 
-  Widget mainBlock(AsyncSnapshot<Carteira> snapshot) {
+  Widget _mainBlock(AsyncSnapshot<Carteira> snapshot) {
     var widgets = <Widget>[
-      titleCard()
+      _titleCard()
     ];
     var children = _widgetsChildren(snapshot);
     widgets.addAll(children);
@@ -108,27 +93,28 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
   }
 
   List<Widget> _widgetsSuccess(Carteira carteira) {
-    var patrimonioFormatado = formatarValorMonetario(carteira.calcularValorAtualCarteira());
-   var rentabilidadeFormatada = formatarPorcentagem(carteira.calcularRentabilidadePercentual());
-   var lucroFormatado = formatarValorMonetario(carteira.calcularLucro());
+    var valorInvestidoCarteira = _formatarValorMonetario(carteira.calcularValorCompraCarteira());
+    var valorAtualCarteira = _formatarValorMonetario(carteira.calcularValorAtualCarteira());
+   var rentabilidadeFormatada = FormatadorNumeros().formatarPorcentagem(carteira.calcularRentabilidadePercentual(), _CASAS_DECIMAIS)+'%';
+   var lucroFormatado = _formatarValorMonetario(carteira.calcularLucro());
     return  <Widget>[
           SizedBox(
             height: 15,
           ),
           Text(
-            "PATRIMÔNIO",
+            "VALOR DA CARTEIRA",
             style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.bold, color:kNighSky),
           ),
           SizedBox(
             height: 5,
           ),
           Text(
-            patrimonioFormatado,
+            valorAtualCarteira,
             style: TextStyle(
                 fontSize: 28,
-                color: kTitleAccentSecundaryColor,
+                color: UiUtils.getColorByValor(carteira.calcularValorAtualCarteira().valorAsDouble()),
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(
@@ -138,7 +124,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             "RENTABILIDADE",
             style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.bold, color:kNighSky),
           ),
           SizedBox(
             height: 5,
@@ -147,9 +133,29 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             rentabilidadeFormatada,
             style: TextStyle(
                 fontSize: 28,
-                color: _corValorRentabilidade(carteira),
+                color: UiUtils.getColorByValor(carteira.calcularRentabilidadePercentual()),
                 fontWeight: FontWeight.bold),
           ),
+
+      SizedBox(
+        height: 8,
+      ),
+      Text(
+        "VALOR INVESTIDO",
+        style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold, color:kNighSky),
+      ),
+      SizedBox(
+        height: 5,
+      ),
+      Text(
+        valorInvestidoCarteira,
+        style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold, color:kTitleAccentSecundaryColor),
+      ),
+
           SizedBox(
             height: 15,
           ),
@@ -160,18 +166,20 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
                 TextSpan(
                     text: lucroFormatado,
                     style: TextStyle(
-                      color: _corValorLucro(carteira),
+                      color: UiUtils.getColorByValor(carteira.calcularLucro().valorAsDouble()),
                     )),
               ],
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18, color:kNighSky),
             ),
           ),
+
+
 
         ];
 
   }
 
-  Row titleCard() {
+  Widget _titleCard() {
     return Row(
           children: <Widget>[
             Icon(
