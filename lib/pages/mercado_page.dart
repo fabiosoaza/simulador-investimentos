@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
-import 'package:simulador_investimentos/pages/template/default_statefull_page.dart';
-import 'package:simulador_investimentos/pages/template/default_statefull_page_state.dart';
+import 'package:simulador_investimentos/pages/base/default_statefull_page.dart';
+import 'package:simulador_investimentos/pages/base/default_statefull_page_state.dart';
 import 'package:simulador_investimentos/widgets/card_ativos.dart';
 
 class MercadoPage extends DefaultStatefullPage {

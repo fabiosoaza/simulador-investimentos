@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/model/repository/carteira_repository.dart';
 
-import 'base_loadable_bloc.dart';
-import 'bloc_events.dart';
+import 'base/base_loadable_bloc.dart';
+import 'base/bloc_events.dart';
 
 class AtivosCarteiraBloc extends BaseLoadableBloc<Carteira> {
 

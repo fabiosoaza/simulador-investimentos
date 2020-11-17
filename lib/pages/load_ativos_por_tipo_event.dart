@@ -1,4 +1,4 @@
-import 'package:simulador_investimentos/pages/bloc_events.dart';
+import 'package:simulador_investimentos/pages/base/bloc_events.dart';
 
 class LoadAtivosPorTipoEvent extends LoadDataEvent{
 

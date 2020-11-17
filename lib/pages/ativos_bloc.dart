@@ -1,7 +1,7 @@
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/repository/ativo_repository.dart';
-import 'package:simulador_investimentos/pages/base_loadable_bloc.dart';
-import 'package:simulador_investimentos/pages/bloc_events.dart';
+import 'package:simulador_investimentos/pages/base/base_loadable_bloc.dart';
+import 'package:simulador_investimentos/pages/base/bloc_events.dart';
 import 'package:simulador_investimentos/pages/load_ativos_por_tipo_event.dart';
 
 class AtivosBloc extends BaseLoadableBloc<List<Ativo>> {

@@ -6,7 +6,7 @@ import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/pages/ativos_carteira_bloc.dart';
-import 'package:simulador_investimentos/pages/bloc_events.dart';
+import 'package:simulador_investimentos/pages/base/bloc_events.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
