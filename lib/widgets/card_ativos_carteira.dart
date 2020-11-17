@@ -5,6 +5,8 @@ import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao
 import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
+import 'package:simulador_investimentos/pages/ativos_carteira_bloc.dart';
+import 'package:simulador_investimentos/pages/bloc_events.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
@@ -19,12 +21,13 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
-  Future<Carteira> _futureCarteira;
+  AtivosCarteiraBloc _ativosCarteiraBloc;
 
   @override
   void initState() {
     super.initState();
-    _futureCarteira = _applicationContext.carteiraRepository.carregar();
+    _ativosCarteiraBloc = AtivosCarteiraBloc(_applicationContext.carteiraRepository);
+    _ativosCarteiraBloc.onEventChanged(LoadDataEvent());
   }
 
 
@@ -41,34 +44,80 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            Expanded(child: FutureBuilder<Carteira>(
-                future: _futureCarteira,
-                builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
-                  return mainBlock(snapshot);
-                }
-            )),
+            Expanded(child: StreamBuilder<bool>(
+            stream: _ativosCarteiraBloc.isLoading,
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot)  {
+              final isLoading = snapshot.data ?? false;
+              if (isLoading) {
+                return _buildBlockLoading();
+              } else {
+                return _buildBody();
+              }
+            }
+            )
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget mainBlock(AsyncSnapshot<Carteira> snapshot) {
-    var widgets = <Widget>[
-      titleCard()
-    ];
-    var children = _widgetsChildren(snapshot);
-    widgets.addAll(children);
-    return Padding(
-      padding: const EdgeInsets.only(top:5, left:15, right: 15, bottom: 5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: widgets,
-      ),
-    );
-  }
+   StreamBuilder<Carteira> _buildBody() {
+     return StreamBuilder<Carteira>(
+         stream: _ativosCarteiraBloc.outData,
+         builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
+           return _mainBlock(snapshot);
+         }
+     );
+   }
 
-  Widget titleCard() {
+
+   Widget _buildBlockLoading(){
+     var widgets = <Widget>[
+       _titleCard()
+     ];
+     widgets.addAll(_widgetsLoading());
+     return Padding(
+       padding: const EdgeInsets.all(30),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: widgets,
+       ),
+     );
+   }
+
+
+   Widget _mainBlock(AsyncSnapshot<Carteira> snapshot) {
+     var widgets = <Widget>[
+       _titleCard()
+     ];
+
+     var children = <Widget>[];
+     if(snapshot.hasData){
+       children = children = [
+         SizedBox(
+           height: 15,
+         ),
+         Expanded(child: _listView(snapshot.data))
+       ];
+     }else if (snapshot.hasError) {
+       children = _widgetsError(snapshot);
+     }
+     widgets.addAll(children);
+     widgets.add( SizedBox(
+       height: 15,
+     ),
+     );
+     return Padding(
+       padding: const EdgeInsets.only(top:5, left:15, right: 15, bottom: 5),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: widgets,
+       ),
+     );
+   }
+
+  Widget _titleCard() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -96,24 +145,6 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
 
 
-  List<Widget> _widgetsChildren(AsyncSnapshot<Carteira> snapshot) {
-    List<Widget> children = [];
-    if(snapshot.hasData) {
-      children = [
-        SizedBox(
-          height: 15,
-        ),
-        Expanded(child: listView(snapshot.data))
-      ];
-    }else if(snapshot.hasError){
-      children = _widgetsError(snapshot);
-    }
-    else{
-      children = _widgetsLoading();
-    }
-    return children;
-  }
-
   List<Widget> _widgetsError(AsyncSnapshot<Carteira> snapshot) {
     return UiUtils.getErrorLoadingInfo();
   }
@@ -123,71 +154,40 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
 
-  Widget tituloListagem(){
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.layers,
-                size: 30,
-                color: kPrimaryColor,
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Text(
-                'Ativos em carteira',
-                style: TextStyle(
-                  fontSize: 18,
-color:kNighSky,
-
-                ),
-              ),
-            ],
-          )
-
-        ]));
-  }
-
-
-  Widget listView(Carteira carteira) {
+  Widget _listView(Carteira carteira) {
     return Container(
       child: new ListView.builder(
         itemCount: carteira.ativosCarteiraCotacao.length + 1,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
-            return cardHeader();
+            return _cardHeader();
           } else if (carteira.ativosCarteiraCotacao.isNotEmpty) {
             var ativo = carteira.ativosCarteiraCotacao[index - 1];
-            return cardRow(ativo);
+            return _cardRow(ativo);
           } else {
-            return cardNenhumAtivoCarteira();
+            return _cardNenhumAtivoCarteira();
           }
         },
       ),
     );
   }
 
-  Card cardHeader() {
+  Card _cardHeader() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            headerCodigoAtivo(),
-            headerPrecoMedio(),
-            headerValorTotal(),
+            _headerCodigoAtivo(),
+            _headerPrecoMedio(),
+            _headerValorTotal(),
           ],
         ),
       ),
     );
   }
 
-   Card cardNenhumAtivoCarteira() {
+   Card _cardNenhumAtivoCarteira() {
      return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -207,59 +207,59 @@ color:kNighSky,
     );
   }
 
-  Card cardRow(AtivoCarteiraCotacao ativo) {
+  Card _cardRow(AtivoCarteiraCotacao ativo) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            contentCodigoAtivo(ativo),
-            contentPrecoMedio(ativo),
-            contentValorTotal(ativo),
+            _contentCodigoAtivo(ativo),
+            _contentPrecoMedio(ativo),
+            _contentValorTotal(ativo),
           ],
         ),
       ),
     );
   }
 
-  Widget headerCodigoAtivo() {
-    return columnHeader(['Código', 'Quantidade']);
+  Widget _headerCodigoAtivo() {
+    return _columnHeader(['Código', 'Quantidade']);
   }
 
-  Widget headerPrecoMedio() {
-    return columnHeader(['Preço médio', 'Preço atual', 'Variação(%)']);
+  Widget _headerPrecoMedio() {
+    return _columnHeader(['Preço médio', 'Preço atual', 'Variação(%)']);
   }
 
-  Widget headerValorTotal() {
-    return columnHeader(['Valor compra', 'Valor atual']);
+  Widget _headerValorTotal() {
+    return _columnHeader(['Valor compra', 'Valor atual']);
   }
 
-  int getNumeroCasasDecimais(Ativo ativo ){
+  int _getNumeroCasasDecimais(Ativo ativo ){
       return AtivoUtils.getNumeroCasasDecimais(ativo);
   }
 
-  Widget contentCodigoAtivo(AtivoCarteiraCotacao ativoCarteiraCotacao) {
+  Widget _contentCodigoAtivo(AtivoCarteiraCotacao ativoCarteiraCotacao) {
     var title1 = ativoCarteiraCotacao.ativoCarteira.ativo.ticker;
     var title2 = ativoCarteiraCotacao.ativoCarteira.quantidade.toString();
-    return columnContent([title1, title2]);
+    return _columnContent([title1, title2]);
   }
 
-  Widget contentPrecoMedio(AtivoCarteiraCotacao ativoCarteiraCotacao) {
-    var numeroCasasDecimais = getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
+  Widget _contentPrecoMedio(AtivoCarteiraCotacao ativoCarteiraCotacao) {
+    var numeroCasasDecimais = _getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
     var title1 = ativoCarteiraCotacao.ativoCarteira.precoMedio.valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.cotacao.valor.valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title3 = FormatadorNumeros().formatarPorcentagem(ativoCarteiraCotacao.rentabilidadePercentual(), CASAS_DECIMAIS)+'%';
-    return columnContent([title1, title2, title3]);
+    return _columnContent([title1, title2, title3]);
   }
 
-  Widget contentValorTotal(AtivoCarteiraCotacao ativoCarteiraCotacao) {
-    var numeroCasasDecimais = getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
+  Widget _contentValorTotal(AtivoCarteiraCotacao ativoCarteiraCotacao) {
+    var numeroCasasDecimais = _getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
     var title1 = ativoCarteiraCotacao.ativoCarteira.calcularValorTotal().valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.calcularValorAtual().valorFormatadoComCasasDecimais(numeroCasasDecimais);
-    return columnContent([title1, title2]);
+    return _columnContent([title1, title2]);
   }
 
-  Expanded columnHeader(List<String> titles) {
+  Expanded _columnHeader(List<String> titles) {
     var widgets = <Widget>[];
 
     for (var i = 0; i < titles.length; i++) {
@@ -275,7 +275,7 @@ color:kNighSky,
     );
   }
 
-  Expanded columnContent(List<String> titles) {
+  Expanded _columnContent(List<String> titles) {
     var widgets = <Widget>[];
 
     for (var i = 0; i < titles.length; i++) {
@@ -291,4 +291,12 @@ color:kNighSky,
       ),
     );
   }
+
+   @override
+   void dispose() {
+     super.dispose();
+     _ativosCarteiraBloc.dispose();
+   }
+
+
 }

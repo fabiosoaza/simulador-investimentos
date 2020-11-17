@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
+import 'package:simulador_investimentos/pages/ativos_bloc.dart';
+import 'package:simulador_investimentos/pages/load_ativos_por_tipo_event.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
@@ -26,7 +28,7 @@ class _CardAtivosState extends State<CardAtivos> {
   String _titulo;
   String _tipoAtivo;
 
-  Future<List<Ativo>> _futureAtivos;
+  AtivosBloc _ativosBloc;
 
   _CardAtivosState(String tipoAtivo, String titulo) {
     this._tipoAtivo = tipoAtivo;
@@ -36,7 +38,8 @@ class _CardAtivosState extends State<CardAtivos> {
   @override
   void initState() {
     super.initState();
-    _futureAtivos = _applicationContext.ativoRepository.listarPorTipo(_tipoAtivo);
+    _ativosBloc = AtivosBloc(_applicationContext.ativoRepository);
+    _ativosBloc.onEventChanged(new LoadAtivosPorTipoEvent(_tipoAtivo));
   }
 
 
@@ -53,31 +56,56 @@ class _CardAtivosState extends State<CardAtivos> {
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            tituloListagem(),
+            _tituloListagem(),
             Expanded(child:
-            FutureBuilder<List<Ativo>>(
-                future: _futureAtivos,
-                builder: (BuildContext context, AsyncSnapshot<List<Ativo>> snapshot)  {
-                  return  mainBlock(snapshot);
+            StreamBuilder<bool>(
+                stream: _ativosBloc.isLoading,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot)  {
+                  final isLoading = snapshot.data ?? false;
+                  if (isLoading) {
+                    return _buildBlockLoading();
+                  } else {
+                    return _buildBody();
+                  }
                 }
-            ))
-
+            )
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget mainBlock(AsyncSnapshot<List<Ativo>> snapshot) {
-    var widget;
+  StreamBuilder<List<Ativo>> _buildBody() {
+    return StreamBuilder<List<Ativo>>(
+        stream: _ativosBloc.outData,
+        builder: (BuildContext context, AsyncSnapshot<List<Ativo>> snapshot)  {
+          return _mainBlock(snapshot);
+        }
+    );
+  }
+
+
+  Widget _buildBlockLoading(){
+    var widgets = <Widget>[];
+    widgets.addAll(UiUtils.getLoadingAnimation());
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      ),
+    );
+  }
+
+
+  Widget _mainBlock(AsyncSnapshot<List<Ativo>> snapshot) {
+    var widget = Container();
     if(snapshot.hasData) {
       widget = _gridView(snapshot.data);
     }
     else if(snapshot.hasError){
       widget = _widgetsError();
-    }
-    else{
-      widget = _widgetsLoading();
     }
     return widget;
   }
@@ -87,11 +115,7 @@ class _CardAtivosState extends State<CardAtivos> {
   }
 
 
-  Widget _widgetsLoading() {
-        return Column(children: UiUtils.getLoadingAnimation());
-  }
-
-  Widget tituloListagem() {
+  Widget _tituloListagem() {
     return Padding(
         padding: const EdgeInsets.only(top:22, left:22, right: 22),
         child: Column(
@@ -196,52 +220,6 @@ class _CardAtivosState extends State<CardAtivos> {
     );
   }
 
-
-
-
-  Card cardHeader() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            _headerCodigoAtivo(),
-            _headerNomeAtivo(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget cardRow(Ativo ativo) {
-    return Card(
-        child: InkWell(
-      onTap: () {
-        showModalBottomSheet<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return Container(
-                  child: Wrap(children: <Widget>[
-                    _menuComprarAtivo(ativo),
-                    _menuVenderAtivo(ativo)
-
-                      ]
-                  )
-              );
-            });
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            _contentCodigoAtivo(ativo),
-            _contentNomeAtivo(ativo),
-          ],
-        ),
-      ),
-    ));
-  }
-
   Widget _menuComprarAtivo(Ativo ativo) {
     var operacao = TipoOperacao.COMPRA;
     var icon = Icons.add_shopping_cart;
@@ -275,50 +253,4 @@ class _CardAtivosState extends State<CardAtivos> {
   }
 
 
-
-  Widget _headerCodigoAtivo() {
-    return _columnHeader('Código');
-  }
-
-  Widget _headerNomeAtivo() {
-    return _columnHeader('Nome');
-  }
-
-  Widget _contentCodigoAtivo(Ativo ativo) {
-    return columnContent(ativo.ticker);
-  }
-
-  Widget _contentNomeAtivo(Ativo ativo) {
-    return columnContent(ativo.nome);
-  }
-
-  Widget _columnHeader(String title1) {
-    return Expanded(
-      child: Column(
-        // align the text to the left instead of centered
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget columnContent(String title1) {
-    return Expanded(
-      child: Column(
-        // align the text to the left instead of centered
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -3,6 +3,8 @@ import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
+import 'package:simulador_investimentos/pages/ativos_carteira_bloc.dart';
+import 'package:simulador_investimentos/pages/bloc_events.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
@@ -16,16 +18,18 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
   static const  int _CASAS_DECIMAIS = 2;
-  Future<Carteira> _futureCarteira;
+  AtivosCarteiraBloc _ativosCarteiraBloc;
 
 
   @override
   void initState() {
     super.initState();
-    _futureCarteira = _applicationContext.carteiraRepository.carregar();
+    _ativosCarteiraBloc = AtivosCarteiraBloc(_applicationContext.carteiraRepository);
+    _ativosCarteiraBloc.onEventChanged(LoadDataEvent());
   }
 
   String _formatarValorMonetario(ValorMonetario valor) => valor.valorFormatadoComCasasDecimais(_CASAS_DECIMAIS);
+
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -39,14 +43,42 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            Expanded(child: FutureBuilder<Carteira>(
-                future: _futureCarteira,
-                builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
-                  return _mainBlock(snapshot);
-                }
-            )),
+            Expanded(child: StreamBuilder<bool>(
+                stream: _ativosCarteiraBloc.isLoading,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot)  {
+                  final isLoading = snapshot.data ?? false;
+                  if (isLoading) {
+                    return _buildBlockLoading();
+                  } else {
+                    return _buildBody();
+                  }
+               })
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  StreamBuilder<Carteira> _buildBody() {
+    return StreamBuilder<Carteira>(
+              stream: _ativosCarteiraBloc.outData,
+              builder: (BuildContext context, AsyncSnapshot<Carteira> snapshot)  {
+                return _mainBlock(snapshot);
+              }
+          );
+  }
+
+  Widget _buildBlockLoading(){
+    var widgets = <Widget>[
+      _titleCard()
+    ];
+    widgets.addAll(_widgetsLoading());
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
       ),
     );
   }
@@ -56,12 +88,18 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
     var widgets = <Widget>[
       _titleCard()
     ];
-    var children = _widgetsChildren(snapshot);
+
+    var children = <Widget>[];
+    if(snapshot.hasData){
+      children = _widgetsSuccess(snapshot.data);
+    }else if (snapshot.hasError) {
+      children = _widgetsError(snapshot);
+    }
     widgets.addAll(children);
     widgets.add( SizedBox(
       height: 15,
     ),
-        );
+    );
     widgets.add( new Divider(color: kNighSky,));
     return Padding(
       padding: const EdgeInsets.all(30),
@@ -72,19 +110,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
     );
   }
 
-  List<Widget> _widgetsChildren(AsyncSnapshot<Carteira> snapshot) {
-    var children;
-    if(snapshot.hasData){
-      children = _widgetsSuccess(snapshot.data);
-    }else if (snapshot.hasError) {
-      children = _widgetsError(snapshot);
-    } else {
-      children = _widgetsLoading();
-    }
-    return children;
-  }
-
-  List<Widget> _widgetsLoading() {
+   List<Widget> _widgetsLoading() {
     return UiUtils.getLoadingAnimation();
   }
 
@@ -200,5 +226,11 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             ),
           ],
         );
+  }
+
+@override
+  void dispose() {
+  super.dispose();
+  _ativosCarteiraBloc.dispose();
   }
 }

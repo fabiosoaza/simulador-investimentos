@@ -22,6 +22,7 @@ class ApplicationContext {
   AtivoCarteiraRepository _ativoCarteiraRepository;
   CotacaoApiClient _cotacaoApiClient;
 
+
   static final String URL_API_COTACOES = "http://rmyk6.mocklab.io";
 
   static ApplicationContext _instance =  ApplicationContext._privateConstructor();
@@ -51,4 +52,4 @@ class ApplicationContext {
     return new Client();
   }
 
-}
+ }
