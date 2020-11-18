@@ -51,4 +51,15 @@ class AtivoDao {
     return ativos;
   }
 
+  Future<Ativo> findByTicker(String ticker) async {
+    var ativos = List<Ativo>();
+    final rows = await _databaseHelper.queryAllByFilter(NOME_TABELA, {COLUNA_TICKER:ticker});
+    rows.forEach((linha) {
+      var ativo = Ativo(
+          linha[COLUNA_ID], linha[COLUNA_TICKER], linha[COLUNA_TIPO], linha[COLUNA_NOME], linha[COLUNA_MERCADO], linha[COLUNA_LOGO]);
+      ativos.add(ativo);
+    });
+    return ativos.isNotEmpty ? ativos[0] : null;
+  }
+
 }

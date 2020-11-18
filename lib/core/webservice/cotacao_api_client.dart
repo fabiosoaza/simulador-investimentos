@@ -15,7 +15,7 @@ class CotacaoApiClient {
     var path = '$_baseUrl/api/v1/quotes/exchange/$mercado/tickers/${tickers.join(",")}';
     var response = await _httpClient.get(path);
     if (response.statusCode != 200) {
-      throw Exception("Falha ao consultar API");
+      throw Exception("Falha ao consultar API. Response[Headers: ${response.headers}, Status: ${response.statusCode}, Body: ${response.body}]");
     }
     List<dynamic> results = jsonDecode(response.body);
     return results;
