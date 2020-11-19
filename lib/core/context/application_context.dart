@@ -9,6 +9,7 @@ import 'package:simulador_investimentos/core/model/repository/cotacao_repository
 import 'package:simulador_investimentos/core/service/ativo_carteira_service.dart';
 import 'package:simulador_investimentos/core/service/carteira_service.dart';
 import 'package:simulador_investimentos/core/service/ativo_service.dart';
+import 'package:simulador_investimentos/core/util/connectivity_checker.dart';
 import 'package:simulador_investimentos/core/webservice/cotacao_api_client.dart';
 import 'package:simulador_investimentos/core/webservice/cotacao_web_service.dart';
 
@@ -21,6 +22,7 @@ class ApplicationContext {
   CarteiraRepository _carteiraRepository;
   AtivoCarteiraRepository _ativoCarteiraRepository;
   CotacaoApiClient _cotacaoApiClient;
+  ConnectivityChecker _connectivityChecker;
 
 
   static final String URL_API_COTACOES = "http://rmyk6.mocklab.io";
@@ -29,7 +31,8 @@ class ApplicationContext {
 
   ApplicationContext._privateConstructor() {
     _databaseHelper = DatabaseHelper();
-    _cotacaoApiClient = CotacaoApiClient(URL_API_COTACOES, _httpClient());
+    _connectivityChecker = _getInitializedConnectivityChecker();
+    _cotacaoApiClient = CotacaoApiClient(URL_API_COTACOES, _httpClient(), _connectivityChecker);
     _ativoDao = AtivoDao(_databaseHelper);
     _ativoCarteiraDao = AtivoCarteiraDao(_databaseHelper);
     _cotacaoRepository = CotacaoWebService(_ativoCarteiraDao,_cotacaoApiClient);
@@ -43,6 +46,7 @@ class ApplicationContext {
   CotacaoRepository get cotacaoRepository => _cotacaoRepository;
   AtivoRepository get ativoRepository => _ativoRepository;
   AtivoCarteiraRepository get ativoCarteiraRepository => _ativoCarteiraRepository;
+  ConnectivityChecker get connectivityChecker => _connectivityChecker;
 
   static ApplicationContext instance() {
     return _instance;
@@ -52,4 +56,14 @@ class ApplicationContext {
     return new Client();
   }
 
- }
+  ConnectivityChecker _getInitializedConnectivityChecker() {
+    if(_connectivityChecker == null){
+      var connection = ConnectivityChecker.getInstance();
+      connection.initialize();
+      return connection;
+    }
+    return _connectivityChecker;
+  }
+
+
+}

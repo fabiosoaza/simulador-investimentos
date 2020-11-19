@@ -1,7 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
+import 'package:simulador_investimentos/core/context/application_context.dart';
+import 'package:simulador_investimentos/core/util/connectivity_checker.dart';
 
-class PersonIdentification extends StatelessWidget {
+class PersonIdentification extends StatefulWidget {
+  @override
+  _PersonIdentificationState createState() => _PersonIdentificationState();
+}
+
+class _PersonIdentificationState extends State<PersonIdentification> {
+
+  StreamSubscription _connectionChangeStreamSubscription;
+
+  ConnectivityChecker _connectivityChecker;
+
+
+  bool _isOnline = false;
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _connectivityChecker = ApplicationContext.instance().connectivityChecker;
+    _connectionChangeStreamSubscription = _connectivityChecker.connectionChange.listen(_connectionChanged);
+    _isOnline = _connectivityChecker.hasConnection;
+
+  }
+
+  void _connectionChanged(dynamic hasConnection) {
+    if(this.mounted) {
+      setState(() {
+        _isOnline = hasConnection;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return
@@ -18,8 +54,8 @@ class PersonIdentification extends StatelessWidget {
             )
             ,
             SizedBox(width: 10,),
-            Text("Simulador de Carteira",
-              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold,),
+            Text("Simulador de Carteira(${_isOnline?  'Online' :  'Offline'})",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
             )
           ],
         ),

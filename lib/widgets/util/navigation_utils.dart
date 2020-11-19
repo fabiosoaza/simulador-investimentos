@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
@@ -91,6 +92,25 @@ class NavigationUtils {
       ),
       duration:  Duration(seconds: 3),
     )..show(context);
+  }
+
+  static void showTopNotification(String text, BuildContext context) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Flushbar(
+        backgroundColor: kWhiteColor,
+        isDismissible: true,
+        flushbarPosition: FlushbarPosition.TOP,
+        messageText: Text(
+          text,
+          style: TextStyle(
+              color: kPrimaryColor, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        duration:  Duration(seconds: 3),
+      )..show(context);
+    });
+
+
+
   }
 
   static void closePage(BuildContext context) {
