@@ -119,7 +119,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
   Widget _titleCard() {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.only(top:20, left: 20, right: 20),
       child: Row(
         children: <Widget>[
           Icon(

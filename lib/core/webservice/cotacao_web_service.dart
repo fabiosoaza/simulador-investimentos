@@ -4,17 +4,20 @@ import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/cotacao.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
 import 'package:simulador_investimentos/core/model/repository/cotacao_repository.dart';
-import 'package:simulador_investimentos/core/webservice/cotacao_api_client.dart';
+import 'package:simulador_investimentos/core/webservice/cotacao_mercado_bitcoin_api_client.dart';
+import 'package:simulador_investimentos/core/webservice/cotacao_yahoo_finance_api_client.dart';
 
 class CotacaoWebService extends CotacaoRepository{
 
   static final Map<String, Cotacao> _cacheCotacoes = Map<String, Cotacao>();
   AtivoCarteiraDao _ativoCarteiraDao;
-  CotacaoApiClient _cotacaoApiClient;
+  CotacaoYahooFinanceApiClient _cotacaoYahooFinanceApiClient;
+  CotacaoMercadoBitcoinApiClient _cotacaoMercadoBitcoinApiClient;
 
-  CotacaoWebService(AtivoCarteiraDao ativoCarteiraDao, CotacaoApiClient cotacaoApiClient){
+  CotacaoWebService(AtivoCarteiraDao ativoCarteiraDao, CotacaoYahooFinanceApiClient cotacaoApiClient, CotacaoMercadoBitcoinApiClient cotacaoMercadoBitcoinApiClient){
       this._ativoCarteiraDao = ativoCarteiraDao;
-      this._cotacaoApiClient = cotacaoApiClient;
+      this._cotacaoYahooFinanceApiClient = cotacaoApiClient;
+      this._cotacaoMercadoBitcoinApiClient = cotacaoMercadoBitcoinApiClient;
   }
 
   @override
@@ -44,7 +47,8 @@ class CotacaoWebService extends CotacaoRepository{
   }
 
   Future<List<Cotacao>> _buscarCotacoesApi(String mercado, List<String> tickers, List<Ativo> ativos) async {
-    var cotacoesMercado = await _cotacaoApiClient.buscarCotacoes(mercado, tickers);
+    var buscarCotacoes = mercado == 'B3' ?  _cotacaoYahooFinanceApiClient.buscarCotacoes(mercado, tickers) :  _cotacaoMercadoBitcoinApiClient.buscarCotacoes(mercado, tickers);
+    var cotacoesMercado = await buscarCotacoes;
     var cotacoes = List<Cotacao>();
     cotacoesMercado.forEach((result) {
       var ativo = ativos.firstWhere((element) => element.ticker == result["ticker"] && element.mercado ==result["exchange"]);
