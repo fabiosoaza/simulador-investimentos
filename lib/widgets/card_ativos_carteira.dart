@@ -1,13 +1,12 @@
 import "package:flutter/material.dart";
 import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao.dart';
 import 'package:simulador_investimentos/core/model/domain/carteira.dart';
-import 'package:simulador_investimentos/core/util/ativo_utils.dart';
 import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
 import 'package:simulador_investimentos/pages/ativos_carteira_bloc.dart';
 import 'package:simulador_investimentos/pages/base/bloc_events.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
+import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
 import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
 class CardAtivosCarteira extends StatefulWidget {
@@ -209,16 +208,21 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
 
   Card _cardRow(AtivoCarteiraCotacao ativo) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            _contentCodigoAtivo(ativo),
-            _contentPrecoMedio(ativo),
-            _contentValorTotal(ativo),
-          ],
-        ),
-      ),
+        child: InkWell(
+            onTap: () {
+              NavigationUtils.showMenuOperacaoAtivo(context, ativo.ativoCarteira.ativo);
+            },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                _contentCodigoAtivo(ativo),
+                _contentPrecoMedio(ativo),
+                _contentValorTotal(ativo),
+              ],
+            ),
+          ),
+        )
     );
   }
 
@@ -234,10 +238,6 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
     return _columnHeader(['Valor compra', 'Valor atual']);
   }
 
-  int _getNumeroCasasDecimais(Ativo ativo ){
-      return AtivoUtils.getNumeroCasasDecimais(ativo);
-  }
-
   Widget _contentCodigoAtivo(AtivoCarteiraCotacao ativoCarteiraCotacao) {
     var title1 = ativoCarteiraCotacao.ativoCarteira.ativo.ticker;
     var title2 = ativoCarteiraCotacao.ativoCarteira.quantidade.toString();
@@ -245,7 +245,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
   Widget _contentPrecoMedio(AtivoCarteiraCotacao ativoCarteiraCotacao) {
-    var numeroCasasDecimais = _getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
+    var numeroCasasDecimais = CASAS_DECIMAIS;
     var title1 = ativoCarteiraCotacao.ativoCarteira.precoMedio.valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.cotacao.valor.valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title3 = FormatadorNumeros().formatarPorcentagem(ativoCarteiraCotacao.rentabilidadePercentual(), CASAS_DECIMAIS)+'%';
@@ -253,7 +253,7 @@ class _CardAtivosCarteiraState extends State<CardAtivosCarteira> {
   }
 
   Widget _contentValorTotal(AtivoCarteiraCotacao ativoCarteiraCotacao) {
-    var numeroCasasDecimais = _getNumeroCasasDecimais(ativoCarteiraCotacao.ativoCarteira.ativo);
+    var numeroCasasDecimais = CASAS_DECIMAIS;
     var title1 = ativoCarteiraCotacao.ativoCarteira.calcularValorTotal().valorFormatadoComCasasDecimais(numeroCasasDecimais);
     var title2 = ativoCarteiraCotacao.calcularValorAtual().valorFormatadoComCasasDecimais(numeroCasasDecimais);
     return _columnContent([title1, title2]);

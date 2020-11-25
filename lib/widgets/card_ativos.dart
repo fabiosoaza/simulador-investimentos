@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
-import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
 import 'package:simulador_investimentos/pages/ativos_bloc.dart';
 import 'package:simulador_investimentos/pages/load_ativos_por_tipo_event.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
@@ -173,24 +172,13 @@ class _CardAtivosState extends State<CardAtivos> {
       child: Card(
         child: InkWell(
           onTap: () {
-            showModalBottomSheet<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                      child: Wrap(children: <Widget>[
-                        _menuComprarAtivo(ativo),
-                        _menuVenderAtivo(ativo)
-
-                      ]
-                      )
-                  );
-                });
+            NavigationUtils.showMenuOperacaoAtivo(context, ativo);
           },
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: Row(
               children: <Widget>[
-                _gitem(ativo, index),
+                _gridTile(ativo, index),
               ],
             ),
           ),
@@ -199,7 +187,7 @@ class _CardAtivosState extends State<CardAtivos> {
     );
   }
 
-  Widget _gitem(Ativo ativo, int index) {
+  Widget _gridTile(Ativo ativo, int index) {
     return Expanded(
       child: Column(
         // align the text to the left instead of centered
@@ -218,38 +206,6 @@ class _CardAtivosState extends State<CardAtivos> {
         ],
       ),
     );
-  }
-
-  Widget _menuComprarAtivo(Ativo ativo) {
-    var operacao = TipoOperacao.COMPRA;
-    var icon = Icons.add_shopping_cart;
-    var text = 'Comprar ${ativo.ticker}';
-    return _menuItem(operacao, ativo, icon, text);
-  }
-
-  Widget _menuVenderAtivo(Ativo ativo) {
-    var operacao = TipoOperacao.VENDA;
-    var icon = Icons.remove_shopping_cart;
-    var text = 'Vender ${ativo.ticker}';
-    return _menuItem(operacao, ativo, icon, text);
-  }
-
-
-  ListTile _menuItem(TipoOperacao operacao, Ativo ativo, IconData icon, String text) {
-    return ListTile(
-      onTap: () {
-        NavigationUtils.close(context);
-        NavigationUtils.navigateToOperacao(
-            context, operacao, ativo);
-      },
-      leading: Icon(
-        icon,
-        size: 30,
-      ),
-      title: Text(text,
-          textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: kNighSky))
-  );
   }
 
 

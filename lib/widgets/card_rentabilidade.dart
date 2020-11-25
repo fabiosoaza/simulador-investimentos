@@ -140,7 +140,7 @@ class _CardRentabilidadeState extends State<CardRentabilidade> {
             valorAtualCarteira,
             style: TextStyle(
                 fontSize: 28,
-                color: UiUtils.getColorByValor(carteira.calcularValorAtualCarteira().valorAsDouble()),
+                color: UiUtils.getColorByValor(carteira.calcularValorAtualCarteira().valorAsDouble() - carteira.calcularValorCompraCarteira().valorAsDouble()),
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(

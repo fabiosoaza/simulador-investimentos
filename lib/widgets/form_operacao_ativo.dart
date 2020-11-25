@@ -98,7 +98,7 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   Function _save(OperacaoAtivoBloc bloc) {
     return () {
       bloc.executarOperacao().whenComplete(() {
-        NavigationUtils.goBack(context);
+        NavigationUtils.replaceWithAtivosCarteira(context);
         NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
       });
     };
