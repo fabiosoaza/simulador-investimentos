@@ -20,7 +20,7 @@ class CotacaoYahooFinanceApiClient {
     checkInternetConnection();
     var tickersFormatados= _getTickersFormatados(tickers);
     var path = '$_baseUrl/v7/finance/quote?symbols=$tickersFormatados';
-    var response = await _httpClient.get(path);
+    var response = await _httpClient.get(path).timeout(Duration(seconds:5));
     if (response.statusCode != 200) {
       throw FalhaApiCotacaoException("Falha ao consultar API. Response[Headers: ${response.headers}, Status: ${response.statusCode}, Body: ${response.body}]");
     }

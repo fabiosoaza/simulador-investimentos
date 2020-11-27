@@ -1,5 +1,4 @@
 
-import 'package:simulador_investimentos/core/dao/ativo_carteira_dao.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/cotacao.dart';
 import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
@@ -10,12 +9,10 @@ import 'package:simulador_investimentos/core/webservice/cotacao_yahoo_finance_ap
 class CotacaoWebService extends CotacaoRepository{
 
   static final Map<String, Cotacao> _cacheCotacoes = Map<String, Cotacao>();
-  AtivoCarteiraDao _ativoCarteiraDao;
   CotacaoYahooFinanceApiClient _cotacaoYahooFinanceApiClient;
   CotacaoMercadoBitcoinApiClient _cotacaoMercadoBitcoinApiClient;
 
-  CotacaoWebService(AtivoCarteiraDao ativoCarteiraDao, CotacaoYahooFinanceApiClient cotacaoApiClient, CotacaoMercadoBitcoinApiClient cotacaoMercadoBitcoinApiClient){
-      this._ativoCarteiraDao = ativoCarteiraDao;
+  CotacaoWebService(CotacaoYahooFinanceApiClient cotacaoApiClient, CotacaoMercadoBitcoinApiClient cotacaoMercadoBitcoinApiClient){
       this._cotacaoYahooFinanceApiClient = cotacaoApiClient;
       this._cotacaoMercadoBitcoinApiClient = cotacaoMercadoBitcoinApiClient;
   }

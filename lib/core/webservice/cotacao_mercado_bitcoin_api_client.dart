@@ -28,7 +28,7 @@ class CotacaoMercadoBitcoinApiClient {
 
   Future<Map<String, dynamic>> consultarApi(String mercado, String ticker) async {
     var path = '$_baseUrl/$ticker/ticker';
-    var response = await _httpClient.get(path);
+    var response = await _httpClient.get(path).timeout(Duration(seconds:3));
     if (response.statusCode != 200) {
       throw FalhaApiCotacaoException("Falha ao consultar API. Response[Headers: ${response.headers}, Status: ${response.statusCode}, Body: ${response.body}]");
     }

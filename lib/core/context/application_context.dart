@@ -1,3 +1,4 @@
+
 import 'package:http/http.dart';
 import 'package:simulador_investimentos/core/dao/ativo_carteira_dao.dart';
 import 'package:simulador_investimentos/core/dao/ativo_dao.dart';
@@ -40,7 +41,7 @@ class ApplicationContext {
     _cotacaoYahooFinanceApiClient = CotacaoYahooFinanceApiClient(URL_API_COTACOES_YAHOO_FINANCE, clientHttp, connectivityChecker);
     _ativoDao = AtivoDao(_databaseHelper);
     _ativoCarteiraDao = AtivoCarteiraDao(_databaseHelper);
-    _cotacaoRepository = CotacaoWebService(_ativoCarteiraDao,_cotacaoYahooFinanceApiClient, _cotacaoMercadoBitcoinApiClient);
+    _cotacaoRepository = CotacaoWebService(_cotacaoYahooFinanceApiClient, _cotacaoMercadoBitcoinApiClient);
     _carteiraRepository = CarteiraService(_ativoCarteiraDao, _cotacaoRepository);
     _ativoRepository = AtivoService(_ativoDao);
     _ativoCarteiraRepository = AtivoCarteiraService(_ativoCarteiraDao);
@@ -58,7 +59,8 @@ class ApplicationContext {
   }
 
   static Client _httpClient(){
-    return new Client();
+    var client = Client();
+    return client;
   }
 
   ConnectivityChecker _getInitializedConnectivityChecker() {

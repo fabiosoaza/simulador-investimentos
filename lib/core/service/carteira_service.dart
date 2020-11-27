@@ -4,14 +4,14 @@ import 'package:simulador_investimentos/core/model/domain/ativo_carteira_cotacao
 import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/cotacao.dart';
 import 'package:simulador_investimentos/core/model/repository/carteira_repository.dart';
-import 'package:simulador_investimentos/core/webservice/cotacao_web_service.dart';
+import 'package:simulador_investimentos/core/model/repository/cotacao_repository.dart';
 
 class CarteiraService extends CarteiraRepository {
   AtivoCarteiraDao _ativoCarteiraDao;
-  CotacaoWebService _cotacaoService;
+  CotacaoRepository _cotacaoService;
 
   CarteiraService(
-      AtivoCarteiraDao ativoCarteiraDao, CotacaoWebService cotacaoService) {
+      AtivoCarteiraDao ativoCarteiraDao, CotacaoRepository cotacaoService) {
     this._ativoCarteiraDao = ativoCarteiraDao;
     this._cotacaoService = cotacaoService;
   }
