@@ -45,9 +45,13 @@ class Carteira {
   }
 
   AtivoCarteira findAtivoCarteira(Ativo ativo){
+     return findAtivoCarteiraByTicker(ativo.ticker);
+  }
+
+  AtivoCarteira findAtivoCarteiraByTicker(String ticker){
     var ativoCarteira;
     _ativosCarteiraCotacao.forEach((ativoCarteiraCotacao) {
-      if(ativoCarteiraCotacao.ativoCarteira.ativo.ticker == ativo.ticker){
+      if(ativoCarteiraCotacao.ativoCarteira.ativo.ticker == ticker){
         ativoCarteira = ativoCarteiraCotacao.ativoCarteira;
       }
     });

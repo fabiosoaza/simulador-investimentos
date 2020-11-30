@@ -2,7 +2,7 @@ import '../domain/ativo.dart';
 import '../domain/cotacao.dart';
 
 abstract class CotacaoRepository{
-  Cotacao buscarCotacao(Ativo ativo);
-  Future<void> carregarCotacoes();
+  Future<Cotacao> buscarCotacao(Ativo ativo);
+  Future<List<Cotacao>> buscarCotacoes(List<Ativo> ativo);
 
 }

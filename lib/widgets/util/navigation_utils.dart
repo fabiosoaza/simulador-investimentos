@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
@@ -22,6 +23,10 @@ class NavigationUtils {
 
   static void navigateToOperacao( BuildContext context, TipoOperacao tipoOperacao, Ativo ativo) async {
     navigateTo(context, OperacaoPage(tipoOperacao, ativo));
+  }
+
+  static void navigateToAtivosCarteira( BuildContext context) async {
+    navigateTo(context, AtivosCarteiraPage());
   }
 
   static Future<dynamic> navigateTo( BuildContext context, Widget widget){
@@ -53,7 +58,6 @@ class NavigationUtils {
   static  Future<dynamic>  replaceWithOperacao( BuildContext context, TipoOperacao tipoOperacao, Ativo ativo) async {
     return replacePageWith(context, OperacaoPage(tipoOperacao, ativo));
   }
-
 
 
   static void showMessage(final BuildContext context, String text, {Function onVisible} ) {
@@ -93,6 +97,25 @@ class NavigationUtils {
     )..show(context);
   }
 
+  static void showTopNotification(String text, BuildContext context) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Flushbar(
+        backgroundColor: kWhiteColor,
+        isDismissible: true,
+        flushbarPosition: FlushbarPosition.TOP,
+        messageText: Text(
+          text,
+          style: TextStyle(
+              color: kPrimaryColor, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        duration:  Duration(seconds: 3),
+      )..show(context);
+    });
+
+
+
+  }
+
   static void closePage(BuildContext context) {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
@@ -106,4 +129,53 @@ class NavigationUtils {
       return widget;
     }));
   }
+
+
+  static void showMenuOperacaoAtivo(BuildContext context, Ativo ativo){
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+              child: Wrap(children: <Widget>[
+                _menuComprarAtivo(context, ativo),
+                _menuVenderAtivo(context, ativo)
+
+              ]
+              )
+          );
+        });
+  }
+
+  static Widget _menuComprarAtivo(BuildContext context, Ativo ativo) {
+    var operacao = TipoOperacao.COMPRA;
+    var icon = Icons.add_shopping_cart;
+    var text = 'Comprar ${ativo.ticker}';
+    return _menuItem(context, operacao, ativo, icon, text);
+  }
+
+  static Widget _menuVenderAtivo(BuildContext context, Ativo ativo) {
+    var operacao = TipoOperacao.VENDA;
+    var icon = Icons.remove_shopping_cart;
+    var text = 'Vender ${ativo.ticker}';
+    return _menuItem(context, operacao, ativo, icon, text);
+  }
+
+
+  static ListTile _menuItem(BuildContext context, TipoOperacao operacao, Ativo ativo, IconData icon, String text) {
+    return ListTile(
+        onTap: () {
+          NavigationUtils.close(context);
+          NavigationUtils.navigateToOperacao(
+              context, operacao, ativo);
+        },
+        leading: Icon(
+          icon,
+          size: 30,
+        ),
+        title: Text(text,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: kNighSky))
+    );
+  }
+
 }

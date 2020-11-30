@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
-import 'package:simulador_investimentos/core/model/domain/ativo_carteira.dart';
-import 'package:simulador_investimentos/core/model/domain/carteira.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
 import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
-import 'package:simulador_investimentos/core/model/domain/validador_valor.dart';
-import 'package:simulador_investimentos/core/model/domain/validador_venda_ativo_carteira.dart';
-import 'package:simulador_investimentos/core/model/domain/valor_monetario.dart';
-import 'package:simulador_investimentos/core/util/ativo_utils.dart';
-import 'package:simulador_investimentos/core/util/formatador_numeros.dart';
+import 'package:simulador_investimentos/pages/operacao_ativo_bloc.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
 
@@ -30,14 +24,12 @@ class FormOperacaoAtivo extends StatefulWidget {
 
 class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
 
-  TextEditingController _precoAtivo = TextEditingController();
-  TextEditingController _quantidade = TextEditingController();
   TipoOperacao _tipoOperacao;
-  GlobalKey<FormState> _formularioKey = GlobalKey<FormState>();
   Ativo _ativo;
-  Carteira _carteira;
 
   ApplicationContext _applicationContext = ApplicationContext.instance();
+
+  OperacaoAtivoBloc _operacaoAtivoBloc;
 
 
   _FormOperacaoAtivoState(TipoOperacao tipoOperacao, Ativo ativo) {
@@ -48,137 +40,99 @@ class _FormOperacaoAtivoState extends State<FormOperacaoAtivo> {
   @override
   void initState() {
     super.initState();
-    resetFields();
-    _applicationContext.carteiraRepository
-        .carregar()
-        .then((value) => _carteira = value);
-  }
+    _operacaoAtivoBloc = OperacaoAtivoBloc(_tipoOperacao, _ativo.ticker, _applicationContext.carteiraRepository, _applicationContext.ativoRepository, _applicationContext.ativoCarteiraRepository);
 
-  void resetFields() {
-    var valorDefault = 0;
-    _precoAtivo.text = valorDefault.toStringAsFixed(numeroCasasDecimaisPreco());
-    _quantidade.text = valorDefault.toStringAsFixed(numeroCasasDecimaisQuantidade());
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: buildForm(),
+      child: _buildForm(),
     );
   }
 
-  void salvar() {
-    var quantidade = extrairQuantidade();
-    var ativoCarteira = AtivoCarteira.novo(_ativo, extrairPrecoMedio(), quantidade);
-    executarOperacao(ativoCarteira);
-    NavigationUtils.goBack(context);
-    NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
-  }
-
-  ValorMonetario extrairPrecoMedio() => ValorMonetario.brl(_precoAtivo.text);
-
-  double extrairQuantidade() => FormatadorNumeros().stringToDouble(_quantidade.text.toString(), AtivoUtils.getNumeroCasasDecimais(_ativo));
-
-  void executarOperacao(AtivoCarteira ativoCarteira) {
-    var result = _tipoOperacao == TipoOperacao.COMPRA ? _applicationContext.ativoCarteiraRepository.adicionar(
-        ativoCarteira) : _applicationContext.ativoCarteiraRepository.remover(
-        ativoCarteira);
-        result.then((value) {
-            //recarrega cache de cotações
-           _applicationContext.cotacaoRepository.carregarCotacoes();
-    });
-  }
-
-  Form buildForm() {
-    return Form(
-      key: _formularioKey,
-      child: Column(
+  Widget _buildForm() {
+    return  Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          buildNumericTextField(
+          _buildNumericTextField(
               label: "Preço médio(R\$)",
-              validationFunction: _validadorValor("Informe um preço válido(R\$)"),
-              controller: _precoAtivo,
-              numeroCasasDecimais: numeroCasasDecimaisPreco()
+              onChangeFunction: _operacaoAtivoBloc.changeValor,
+              streamField: _operacaoAtivoBloc.valor,
+              numeroCasasDecimais: _numeroCasasDecimaisPreco()
           ),
-          buildNumericTextField(
+          _buildNumericTextField(
               label: "Quantidade",
-            validationFunction: _validadorQuantidade(),
-              controller: _quantidade,
-              numeroCasasDecimais: numeroCasasDecimaisQuantidade()
+              onChangeFunction: _operacaoAtivoBloc.changeQuantidade,
+              streamField: _operacaoAtivoBloc.quantidade,
+              numeroCasasDecimais: _numeroCasasDecimaisQuantidade()
           ),
-          criarBotaoSalvar(),
+          _criarBotaoSalvar(_operacaoAtivoBloc),
         ],
-      ),
     );
   }
 
-  int numeroCasasDecimaisQuantidade() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 0 : 4;
+  int _numeroCasasDecimaisQuantidade() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 0 : 4;
 
-  int numeroCasasDecimaisPreco() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 2 : 3;
+  int _numeroCasasDecimaisPreco() => _ativo.tipo == AtivoConstants.TIPO_ACAO ? 2 : 3;
 
-  Widget criarBotaoSalvar() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 26.0),
-      child: RaisedButton(
-        onPressed: () {
-          if (_formularioKey.currentState.validate()) {
-            salvar();
-          }
-        },
-        child: Text(textoBotaoOperacao(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-            )),
-        color: _tipoOperacao == TipoOperacao.COMPRA
-            ? kOperacaoCompraColor
-            : kOperacaoVendaColor,
-      ),
-    );
-  }
-
-  String textoBotaoOperacao() =>
-      _tipoOperacao == TipoOperacao.COMPRA ? "Comprar" : "Vender";
-
-
-  TextFormField buildNumericTextField(
-      {TextEditingController controller, Function validationFunction, String label, int numeroCasasDecimais}) {
-        var regexp = numeroCasasDecimais == 0 ? r'^(\d+)': r'^(\d+)?\.?\d{0,'+numeroCasasDecimais.toString()+'}';
-    return TextFormField(
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(regexp)),
-      ],
-      keyboardType: TextInputType.numberWithOptions(decimal: numeroCasasDecimais !=0 ),
-      decoration: InputDecoration(
-          labelText: label, errorStyle: TextStyle(fontSize: 19)),
-      controller: controller,
-      validator: validationFunction,
-      style: TextStyle(
-        fontSize: 32,
-        color: Colors.black87,
-      ),
-    );
-  }
-
-  Function _validadorValor(String error){
-    return (text) {
-      return ValidadorValor(text).validar() ? null : error;
-    };
-  }
-
-  Function _validadorQuantidade(){
-    return (text) {
-      if(!ValidadorValor(text).validar()){
-        return "Informe a quantidade";
-      }
-      if(_tipoOperacao == TipoOperacao.VENDA){
-        var validador = ValidadorVendaAtivoCarteira(text, _carteira.findAtivoCarteira(_ativo));
-        if (!validador.validar()) {
-          return "Quantidade não disponível";
+  Widget _criarBotaoSalvar(OperacaoAtivoBloc bloc) {
+    return StreamBuilder<bool>(
+        stream: bloc.productValid,
+        builder: (context, snapshot) {
+          return RaisedButton(
+            child: Text( _tipoOperacao == TipoOperacao.COMPRA ? "Comprar" : "Vender",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                )),
+            color: _tipoOperacao == TipoOperacao.COMPRA
+                ? kOperacaoCompraColor
+                : kOperacaoVendaColor,
+            onPressed: !snapshot.hasData ? null : _save(bloc),
+          );
         }
-      }
-      return null;
+    );
+  }
+
+  Function _save(OperacaoAtivoBloc bloc) {
+    return () {
+      bloc.executarOperacao().whenComplete(() {
+        NavigationUtils.replaceWithAtivosCarteira(context);
+        NavigationUtils.showMessage(context, "Operação efetuada com sucesso.");
+      });
     };
   }
+
+
+  StreamBuilder<String> _buildNumericTextField(
+      {Stream<String> streamField, Function onChangeFunction, String label, int numeroCasasDecimais}) {
+        var regexp = numeroCasasDecimais == 0 ? r'^(\d+)': r'^(\d+)?\.?\d{0,'+numeroCasasDecimais.toString()+'}';
+
+        return StreamBuilder<String>(
+            stream: streamField,
+            builder: (context, snapshot) {
+              return TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(regexp)),
+                  ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: numeroCasasDecimais !=0 ),
+                decoration: InputDecoration(
+                    labelText: label, errorText: snapshot.error, errorStyle: TextStyle(fontSize: 19, color: kOperacaoVendaColor)),
+                onChanged: onChangeFunction,
+                style: TextStyle(
+                  fontSize: 32,
+                  color: Colors.black87,
+                ),
+              );
+            });
+
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    _operacaoAtivoBloc.dispose();
+  }
+
 }

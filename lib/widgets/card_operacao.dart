@@ -33,19 +33,24 @@ class _CardOperacaoState extends State<CardOperacao> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 0.82,
+      aspectRatio: 0.85,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            Expanded(child: mainBlock()),
+            Expanded(child: _mainBlock()),
           ],
         ),
       ),
     );
   }
 
-  Padding mainBlock() {
+  Padding _mainBlock() {
     return Padding(
       padding: const EdgeInsets.all(30),
       child: Column(
@@ -54,7 +59,7 @@ class _CardOperacaoState extends State<CardOperacao> {
           Row(
             children: <Widget>[
               Icon(
-                iconeTitulo(),
+                _iconeTitulo(),
                 size: 30,
                 color: kPrimaryColor,
               ),
@@ -62,10 +67,10 @@ class _CardOperacaoState extends State<CardOperacao> {
                 width: 15,
               ),
               Text(
-                titulo(),
+                _titulo(),
                 style: TextStyle(
                   fontSize: 18,
-
+                  color: kNighSky
                 ),
               ),
             ],
@@ -80,7 +85,7 @@ class _CardOperacaoState extends State<CardOperacao> {
     );
   }
 
-  String titulo() => '${_tipoOperacao == TipoOperacao.COMPRA ? "Comprar": "Vender"} ${_ativo.nome}';
+  String _titulo() => '${_tipoOperacao == TipoOperacao.COMPRA ? "Comprar": "Vender"} ${_ativo.nome}';
 
-  IconData iconeTitulo() => _tipoOperacao == TipoOperacao.COMPRA ? Icons.shopping_cart : Icons.shopping_cart;
+  IconData _iconeTitulo() => _tipoOperacao == TipoOperacao.COMPRA ? Icons.shopping_cart : Icons.shopping_cart;
 }

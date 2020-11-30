@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:simulador_investimentos/core/context/application_context.dart';
-import 'package:simulador_investimentos/core/model/domain/ativo_constants.dart';
 import 'package:simulador_investimentos/pages/home_page.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 

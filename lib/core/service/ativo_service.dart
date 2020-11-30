@@ -14,4 +14,9 @@ class AtivoService extends AtivoRepository{
     return _ativoDao.listarPorTipo(tipo);
   }
 
+  @override
+  Future<Ativo> findByTicker(String ticker) {
+    return _ativoDao.findByTicker(ticker);
+  }
+
 }

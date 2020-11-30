@@ -27,6 +27,11 @@ dependencies:
   path_provider: any
   intl: ^0.15.7
   flushbar: ^1.10.4
+  http: ^0.12.0
+  meta: ^1.1.6
+  rxdart: 0.24.1
+  connectivity: ^2.0.2
+  data_connection_checker: ^0.3.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -50,6 +55,90 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/coin.png
+     - assets/abev3.png
+     - assets/bbdc4.png
+     - assets/brap4.png
+     - assets/btc.png
+     - assets/bch.png
+     - assets/brml3.png
+     - assets/cmig4.png
+     - assets/csan3.png
+     - assets/chz.png
+     - assets/ecor3.png
+     - assets/eth.png
+     - assets/engi11.png
+     - assets/egie3.png
+     - assets/ggbr4.png
+     - assets/hgtx3.png
+     - assets/itsa4.png
+     - assets/lame4.png
+     - assets/ltc.png
+     - assets/mrve3.png
+     - assets/petr3.png
+     - assets/petr4.png
+     - assets/rail3.png
+     - assets/sula11.png
+     - assets/tots3.png
+     - assets/vivt4.png
+     - assets/azul4.png
+     - assets/bbse3.png
+     - assets/brdt3.png
+     - assets/btow3.png
+     - assets/cogn3.png
+     - assets/csna3.png
+     - assets/elet3.png
+     - assets/eqtl3.png
+     - assets/gndi3.png
+     - assets/hype3.png
+     - assets/itub4.png
+     - assets/lren3.png
+     - assets/mult3.png
+     - assets/paxg.png
+     - assets/prio3.png
+     - assets/rent3.png
+     - assets/suzb3.png
+     - assets/ugpa3.png
+     - assets/vvar3.png
+     - assets/b3sa3.png
+     - assets/beef3.png
+     - assets/brfs3.png
+     - assets/ccro3.png
+     - assets/cpfe3.png
+     - assets/cvcb3.png
+     - assets/embr3.png
+     - assets/eztc3.png
+     - assets/goll4.png
+     - assets/igta3.png
+     - assets/jbss3.png
+     - assets/mglu3.png
+     - assets/ntco3.png
+     - assets/qual3.png
+     - assets/sanb11.png
+     - assets/taee11.png
+     - assets/usim5.png
+     - assets/wege3.png
+     - assets/bbas3.png
+     - assets/bpac11.png
+     - assets/brkm5.png
+     - assets/ciel3.png
+     - assets/crfb3.png
+     - assets/cyre3.png
+     - assets/enbr3.png
+     - assets/flry3.png
+     - assets/hapv3.png
+     - assets/irbr3.png
+     - assets/klbn11.png
+     - assets/mrfg3.png
+     - assets/pcar3.png
+     - assets/radl3.png
+     - assets/sbsp3.png
+     - assets/timp3.png
+     - assets/usdc.png
+     - assets/vale3.png
+     - assets/wbx.png
+     - assets/xrp.png
+     - assets/yduq3.png
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

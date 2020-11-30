@@ -62,7 +62,7 @@ class _TabOptionState extends State<TabOption> {
               //vertical
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Icon(icon, color: Colors.white, size: 30),
+                Icon(icon, color: Colors.white, size: 50),
                 Spacer(),
                 Text(title,
                     style: TextStyle(

@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:simulador_investimentos/core/context/application_context.dart';
 import 'package:simulador_investimentos/core/model/domain/ativo.dart';
-import 'package:simulador_investimentos/core/model/domain/tipo_operacao.dart';
+import 'package:simulador_investimentos/pages/ativos_bloc.dart';
+import 'package:simulador_investimentos/pages/load_ativos_por_tipo_event.dart';
 import 'package:simulador_investimentos/themes/colors.dart';
 import 'package:simulador_investimentos/widgets/util/navigation_utils.dart';
+import 'package:simulador_investimentos/widgets/util/ui_utils.dart';
 
 class CardAtivos extends StatefulWidget {
   String _tipoAtivo;
@@ -21,10 +24,10 @@ class CardAtivos extends StatefulWidget {
 class _CardAtivosState extends State<CardAtivos> {
   ApplicationContext _applicationContext = ApplicationContext.instance();
 
-  List<Ativo> _ativos = List<Ativo>();
-
   String _titulo;
   String _tipoAtivo;
+
+  AtivosBloc _ativosBloc;
 
   _CardAtivosState(String tipoAtivo, String titulo) {
     this._tipoAtivo = tipoAtivo;
@@ -34,37 +37,86 @@ class _CardAtivosState extends State<CardAtivos> {
   @override
   void initState() {
     super.initState();
-    reload();
+    _ativosBloc = AtivosBloc(_applicationContext.ativoRepository);
+    _ativosBloc.onEventChanged(new LoadAtivosPorTipoEvent(_tipoAtivo));
   }
 
-  Future<void> reload() async {
-    final ativos =
-        await _applicationContext.ativoRepository.listarPorTipo(_tipoAtivo);
-    var updateView = () {
-      this._ativos = ativos;
-    };
-    setState(updateView);
-  }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.35,
+      aspectRatio: 1.40,
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white70, width: 6),
+          borderRadius: BorderRadius.circular(36),
+        ),
+        color: kGrey200,
         margin: EdgeInsets.only(right: 20),
         child: Column(
           children: [
-            tituloListagem(),
-            Expanded(child: listView()),
+            _tituloListagem(),
+            Expanded(child:
+            StreamBuilder<bool>(
+                stream: _ativosBloc.isLoading,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot)  {
+                  final isLoading = snapshot.data ?? false;
+                  if (isLoading) {
+                    return _buildBlockLoading();
+                  } else {
+                    return _buildBody();
+                  }
+                }
+            )
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget tituloListagem() {
+  StreamBuilder<List<Ativo>> _buildBody() {
+    return StreamBuilder<List<Ativo>>(
+        stream: _ativosBloc.outData,
+        builder: (BuildContext context, AsyncSnapshot<List<Ativo>> snapshot)  {
+          return _mainBlock(snapshot);
+        }
+    );
+  }
+
+
+  Widget _buildBlockLoading(){
+    var widgets = <Widget>[];
+    widgets.addAll(UiUtils.getLoadingAnimation());
     return Padding(
-        padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      ),
+    );
+  }
+
+
+  Widget _mainBlock(AsyncSnapshot<List<Ativo>> snapshot) {
+    var widget = Container();
+    if(snapshot.hasData) {
+      widget = _gridView(snapshot.data);
+    }
+    else if(snapshot.hasError){
+      widget = _widgetsError();
+    }
+    return widget;
+  }
+
+  Widget _widgetsError() {
+        return Column(children: UiUtils.getErrorLoadingInfo());
+  }
+
+
+  Widget _tituloListagem() {
+    return Padding(
+        padding: const EdgeInsets.only(top:22, left:22, right: 22),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -82,6 +134,7 @@ class _CardAtivosState extends State<CardAtivos> {
                     _titulo,
                     style: TextStyle(
                       fontSize: 18,
+                      color:kNighSky
                     ),
                   ),
                 ],
@@ -89,142 +142,71 @@ class _CardAtivosState extends State<CardAtivos> {
             ]));
   }
 
-  Widget listView() {
+
+
+  Widget _gridView(List<Ativo> ativos) {
     return Container(
-      child: new ListView.builder(
-        itemCount: _ativos.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return cardHeader();
-          } else {
-            var ativo = _ativos[index - 1];
-            return cardRow(ativo);
-          }
-        },
-      ),
-    );
-  }
-
-  Card cardHeader() {
-    return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            _headerCodigoAtivo(),
-            _headerNomeAtivo(),
+        child: Column(
+          children: [
+            Flexible(
+              child: GridView.builder(
+                physics: BouncingScrollPhysics(), // if you want IOS bouncing effect, otherwise remove this line
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),//change the number as you want
+                scrollDirection: Axis.horizontal,
+                itemCount: ativos.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _gridItem(ativos[index], index);
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget cardRow(Ativo ativo) {
-    return Card(
+  Widget _gridItem(Ativo ativo, int index) {
+    return Container(
+      child: Card(
         child: InkWell(
-      onTap: () {
-        showModalBottomSheet<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return Container(
-                  child: Wrap(children: <Widget>[
-                    _menuComprarAtivo(ativo),
-                    _menuVenderAtivo(ativo)
-
-                      ]
-                  )
-              );
-            });
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            _contentCodigoAtivo(ativo),
-            _contentNomeAtivo(ativo),
-          ],
+          onTap: () {
+            NavigationUtils.showMenuOperacaoAtivo(context, ativo);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              children: <Widget>[
+                _gridTile(ativo, index),
+              ],
+            ),
+          ),
         ),
       ),
-    ));
+    );
   }
 
-  Widget _menuComprarAtivo(Ativo ativo) {
-    var operacao = TipoOperacao.COMPRA;
-    var icon = Icons.add_shopping_cart;
-    var text = 'Comprar ${ativo.nome}';
-    return _menuItem(operacao, ativo, icon, text);
-  }
-
-  Widget _menuVenderAtivo(Ativo ativo) {
-    var operacao = TipoOperacao.VENDA;
-    var icon = Icons.remove_shopping_cart;
-    var text = 'Vender ${ativo.nome}';
-    return _menuItem(operacao, ativo, icon, text);
-  }
-
-
-  ListTile _menuItem(TipoOperacao operacao, Ativo ativo, IconData icon, String text) {
-    return ListTile(
-      onTap: () {
-        NavigationUtils.close(context);
-        NavigationUtils.navigateToOperacao(
-            context, operacao, ativo);
-      },
-      leading: Icon(
-        icon,
-        size: 30,
-      ),
-      title: Text(text,
-          textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-  );
-  }
-
-
-
-  Widget _headerCodigoAtivo() {
-    return _columnHeader('Código');
-  }
-
-  Widget _headerNomeAtivo() {
-    return _columnHeader('Nome');
-  }
-
-  Widget _contentCodigoAtivo(Ativo ativo) {
-    return columnContent(ativo.ticker);
-  }
-
-  Widget _contentNomeAtivo(Ativo ativo) {
-    return columnContent(ativo.nome);
-  }
-
-  Widget _columnHeader(String title1) {
+  Widget _gridTile(Ativo ativo, int index) {
     return Expanded(
       child: Column(
         // align the text to the left instead of centered
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          Center(child: UiUtils.getLogo(ativo.logo)),
+          SizedBox(height: 10,),
+          Center(
+            child: Text(
+              ativo.ticker,
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            ),
           ),
+
+
         ],
       ),
     );
   }
 
-  Widget columnContent(String title1) {
-    return Expanded(
-      child: Column(
-        // align the text to the left instead of centered
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title1,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
+
 }
